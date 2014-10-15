@@ -120,7 +120,6 @@ under the License.
     <Enumeration enumId="VT_HDR_JAVASCRIPT" description="Header JavaScript File URL" enumTypeId="VT_RES_TYPE" sequenceId="09"/>
     <Enumeration enumId="VT_FTR_TMPLT_LOC" description="Footer Template Location" enumTypeId="VT_RES_TYPE" sequenceId="10"/>
     <Enumeration enumId="VT_FTR_JAVASCRIPT" description="Footer JavaScript File URL" enumTypeId="VT_RES_TYPE" sequenceId="11"/>
-    <Enumeration enumId="VT_NAV_TMPLT_LOC" description="Main Navigation Template Location" enumTypeId="VT_RES_TYPE" sequenceId="12"/>
     <Enumeration enumId="VT_NAV_OPEN_TMPLT" description="Opening Navigation Template Location" enumTypeId="VT_RES_TYPE" sequenceId="13"/>
     <Enumeration enumId="VT_NAV_CLOSE_TMPLT" description="Closing Navigation Template Location" enumTypeId="VT_RES_TYPE" sequenceId="14"/>
     <Enumeration enumId="VT_MSG_TMPLT_LOC" description="Main Messages Template Location" enumTypeId="VT_RES_TYPE" sequenceId="15"/>

@@ -787,7 +787,14 @@ public class RequestHandler {
         // send the redirect
         try {            
             resp.setStatus(statusCode);
-            resp.setHeader("Location", url);
+            
+            String scheme = req.getHeader("X-Forwarded-Proto");
+        	if ("https".equals(scheme)){
+        		Debug.logInfo("Redirecting to https://"+req.getHeader("Host")+url, module);
+        		resp.setHeader("Location", "https://"+req.getHeader("Host")+url);
+        	}else {
+        		resp.setHeader("Location", url);
+        	}
             resp.setHeader("Connection", "close");
         } catch (IllegalStateException ise) {
             throw new RequestHandlerException(ise.getMessage(), ise);

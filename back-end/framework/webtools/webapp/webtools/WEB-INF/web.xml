@@ -51,6 +51,10 @@ under the License.
   </context-param>
 
     <filter>
+        <filter-name>O3ErpAuthenticationFilter</filter-name>
+        <filter-class>org.ofbiz.webapp.control.O3ErpAuthenticationFilter</filter-class>
+    </filter>
+    <filter>
         <filter-name>ContextFilter</filter-name>
         <display-name>ContextFilter</display-name>
         <filter-class>org.ofbiz.webapp.control.ContextFilter</filter-class>
@@ -75,6 +79,10 @@ under the License.
             <param-value>true</param-value>
         </init-param>
     </filter>
+    <filter-mapping>
+        <filter-name>O3ErpAuthenticationFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>    
     <filter-mapping>
         <filter-name>ContextFilter</filter-name>
             <url-pattern>/*</url-pattern>

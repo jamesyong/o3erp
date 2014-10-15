@@ -1,0 +1,153 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>O3 ERP</title>
+		<link rel="stylesheet" href="/assets/themes/common.css" media="screen">
+		<link rel="stylesheet" href="/assets/themes/style.css" media="screen">
+		
+		<link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/dojo/1.9.1/dijit/themes/claro/claro.css">
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.9.3/dojox/widget/Toaster/Toaster.css" />
+		
+		<style>
+		label {
+		  margin: 0;
+		  padding: 0;
+		  display: block;
+		  font-size: 100%;
+		  padding-top: .1em;
+		  padding-right: .25em;
+		  width: 6em;
+		  text-align: right;
+		  float: left; 
+		}
+		</style>
+	</head>
+	<body class="claro">
+		<div id='svrMessage'></div>
+		<div id="appLayout" class="demoLayout"></div>
+		
+		<!-- load dojo -->
+		<script>
+		var dojoConfig;
+		(function(){
+			
+			dojoConfig = {
+				async: 1,
+				cacheBust: "1.9.3-0.3.15",
+				packages: [
+					{ name: "commons", location: "/assets/commons" }
+				]
+			};
+		}());
+		</script>
+		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.9.3/dojo/dojo.js" data-dojo-config="isDebug: true, async: true, parseOnLoad: true"></script>
+		<script>
+		    var socket = null;
+        		var wsuri = "wss://{{.WebSocketHost}}/ws";
+		
+			function myGetIconClassFunction(/*dojo.data.Item*/ item, /*Boolean*/ opened){
+		    		return item.directory ? (opened ? "dijitFolderOpened" : "dijitFolderClosed") : "dijitLeaf";
+			}
+			
+			require(["dijit/layout/BorderContainer", "dijit/layout/TabContainer", "dojox/layout/ContentPane", 
+			"dojo/store/Memory", "dijit/tree/ObjectStoreModel", "dijit/Tree", "dijit/registry", "dojox/widget/Toaster",
+			"dojo/_base/xhr", "commons/TabUtil", "dojo/dom","dojox/socket", "dojox/socket/Reconnect",
+			"dojo/topic", "dojo/string",
+			"dijit/Toolbar", "dijit/form/Button", "dojo/parser",
+			"dojo/domReady!"],
+			function(BorderContainer, TabContainer, ContentPane, Memory, ObjectStoreModel, Tree, registry, 
+			Toaster, xhr, TabUtil, dom, Socket, Reconnect, topic, string, Toolbar, Button, parser){
+				
+				xhr.get({
+					url: "/menu",
+					preventCache: true,
+					handleAs: "json"
+				}).then(function(someData){		
+						
+					// create the BorderContainer and attach it to our appLayout div
+					var appLayout = new BorderContainer({
+						design: "headline"
+					}, "appLayout");
+					
+					var contentLayout = new BorderContainer({
+						region: "center",
+						design: "sidebar"
+					});
+					
+					// Create test store, adding the getChildren() method required by ObjectStoreModel
+				    var menuStore = new Memory({
+				        data: someData,
+				        getChildren: function(object){
+				            return this.query({parent: object.id});
+				        }
+				    });
+	
+				    // Create the model
+				    var myModel = new ObjectStoreModel({
+				        store: menuStore,
+				        query: {id: 'root'}
+				    });
+				
+					// create the TabContainer
+					var contentTabs = new TabContainer({
+						region: "center",
+						id: "contentTabs",
+						tabPosition: "bottom",
+						"class": "centerPanel"
+					});
+					contentTabs.watch("selectedChildWidget", function(name, oval, nval){
+						topic.publish("tab/menu", nval.id);
+					});
+					contentLayout.addChild( contentTabs );
+					
+					// create menu tree container
+					var menuTree = new ContentPane({
+						region: "left",
+						id: "leftCol", "class": "edgePanel",
+						content: "<a href='/logout'>Log Out</a><br/>",
+						splitter: true
+					});
+					
+					// add the TabContainer as a child of the BorderContainer
+					appLayout.addChild( contentLayout );
+	
+					// create and add the BorderContainer edge regions
+					appLayout.addChild(
+						new ContentPane({
+							region: "top",
+							"class": "edgePanel",
+							content: "Header content (top)"
+						})
+					);
+					appLayout.addChild( 	menuTree );
+	
+					var tree = new Tree({
+					        model: myModel,
+							getIconClass: myGetIconClassFunction,
+							onClick: function(item){
+								if (item.url.indexOf('win:') === 0){
+									window.open(item.url.substring(4));
+								} else {
+									TabUtil.setTabContent(registry, "contentTabs", item);
+								}
+							},
+							showRoot: false
+					    });
+					menuTree.addChild( tree )
+					var nodes = tree.getNodesByItem('2');
+                    if(!nodes[0].isExpanded){
+                        tree._expandNode(nodes[0]);
+					}
+	
+					// start up and do layout
+					appLayout.startup();
+									
+					
+				});
+				var myToaster = new Toaster({id: 'myToaster'}, dom.byId('svrMessage'));
+				
+			});
+		</script>
+	</body>
+</html>

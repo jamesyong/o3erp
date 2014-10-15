@@ -1,0 +1,51 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Login</title>
+		<link rel="stylesheet" href="/assets/themes/common.css" media="screen" />
+		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.0/dijit/themes/claro/claro.css" media="screen">
+	</head>
+	<body class="claro">
+		<h1>Login</h1>
+		<form data-dojo-type="dijit/form/Form" method="post" action="/login">
+		<script type="dojo/method" event="onSubmit">
+			if(!this.validate()){
+				alert('Form contains invalid data.  Please correct first');
+				return false;
+			}
+			return true;
+		</script>
+		<table cellpadding="0" cellspacing="2">
+			<tr>
+				<td valign="top"><strong>User Name * </strong></td>
+				<td><input type="text" required="true" name="email" id="email" placeholder="Your Email" 
+					data-dojo-type="dijit/form/ValidationTextBox" validator="dojox.validate.isEmailAddress" missingMessage="Ooops!  You forgot your User Name!" /></td>
+			</tr>
+			<tr>
+				<td valign="top"><strong>Password * </strong></td>
+				<td><input type="password" required="true" name="password" id="password" placeholder="Your Password" 
+					data-dojo-type="dijit/form/TextBox"  /></td>
+			</tr>
+		</table>
+		
+		<!-- submit buttons -->
+		<input type="submit" value="Submit Form" label="Submit Form" id="submitButton" data-dojo-type="dijit/form/BusyButton" busyLabel="Logging in..." timeout="2000"/>
+
+		<!-- load dojo and provide config via data attribute -->
+		<script src="//ajax.googleapis.com/ajax/libs/dojo/1.10.0/dojo/dojo.js" data-dojo-config="async: true, parseOnLoad: true"></script>
+		<script>
+			
+			require(["dojo/parser", 
+			/* dojox/ validate resources */
+			"dojox/validate/us", "dojox/validate/web",
+			/* basic dijit classes */
+			"dijit/form/TextBox", "dijit/form/ValidationTextBox", "dijit/form/Form",
+			/* basic dojox classes */
+			"dojox/form/BusyButton",
+			"dojo/domReady!"]);
+			
+		</script>
+	</body>
+</html>
+
