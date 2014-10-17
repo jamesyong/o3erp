@@ -5,10 +5,10 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
-	"o3erp/front-end/config"
-	"o3erp/front-end/helper"
-	"o3erp/front-end/sessions"
-	"o3erp/front-end/templating"
+	"o3erp/frontend/config"
+	"o3erp/frontend/helper"
+	"o3erp/frontend/sessions"
+	"o3erp/frontend/templating"
 )
 
 func LoginViewHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

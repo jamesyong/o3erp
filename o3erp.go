@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"o3erp/front-end/config"
-	"o3erp/front-end/handlers"
-	"o3erp/front-end/sessions"
+	"o3erp/frontend/config"
+	"o3erp/frontend/handlers"
+	"o3erp/frontend/sessions"
 )
 
 /* a middleware that redirects unauthenticated requests to login page
@@ -48,7 +48,7 @@ func main() {
 	mux.GET("/menu", handlers.MenuHandler)
 
 	// handle static files
-	mux.ServeFiles("/assets/*filepath", http.Dir("./front-end/assets"))
+	mux.ServeFiles("/assets/*filepath", http.Dir("./frontend/assets"))
 
 	var u *url.URL
 	var err error
@@ -107,7 +107,7 @@ func main() {
 	}()
 
 	// HTTPS
-	log.Fatal(http.ListenAndServeTLS(config.PORT_HTTPS, "front-end/cert.pem", "front-end/key.pem", app))
+	log.Fatal(http.ListenAndServeTLS(config.PORT_HTTPS, "frontend/cert.pem", "frontend/key.pem", app))
 
 }
 
