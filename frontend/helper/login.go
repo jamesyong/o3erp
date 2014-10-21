@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"git.apache.org/thrift.git/lib/go/thrift"
-	"o3erp/frontend/thriftlib"
+	"github.com/jamesyong/o3erp/frontend/thriftlib"
 )
 
 func Login(loginName string, loginPwd string) (map[string]string, error) {

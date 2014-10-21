@@ -1,10 +1,10 @@
 package handlers
 
 import (
+	"github.com/jamesyong/o3erp/frontend/config"
+	"github.com/jamesyong/o3erp/frontend/templating"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
-	"o3erp/frontend/config"
-	"o3erp/frontend/templating"
 )
 
 func LayoutViewHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

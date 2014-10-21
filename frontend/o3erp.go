@@ -1,15 +1,15 @@
 package frontend
 
 import (
+	"github.com/jamesyong/o3erp/frontend/config"
+	"github.com/jamesyong/o3erp/frontend/handlers"
+	"github.com/jamesyong/o3erp/frontend/sessions"
 	"github.com/julienschmidt/httprouter"
 	"github.com/unrolled/secure"
 	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"o3erp/frontend/config"
-	"o3erp/frontend/handlers"
-	"o3erp/frontend/sessions"
 )
 
 /* a middleware that redirects unauthenticated requests to login page

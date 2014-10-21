@@ -2,13 +2,13 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/jamesyong/o3erp/frontend/config"
+	"github.com/jamesyong/o3erp/frontend/helper"
+	"github.com/jamesyong/o3erp/frontend/sessions"
+	"github.com/jamesyong/o3erp/frontend/templating"
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
-	"o3erp/frontend/config"
-	"o3erp/frontend/helper"
-	"o3erp/frontend/sessions"
-	"o3erp/frontend/templating"
 )
 
 func LoginViewHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
