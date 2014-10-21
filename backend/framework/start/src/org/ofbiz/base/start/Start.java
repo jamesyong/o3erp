@@ -100,7 +100,7 @@ public final class Start {
             } else if (arg.equals("-shutdown")) {
                 command = checkCommand(command, Command.SHUTDOWN);
             } else if (arg.startsWith("-")) {
-                if (!arg.contains("portoffset")) {
+                if (!arg.contains("portoffset") && !arg.contains("ext.dir")) {
                     command = checkCommand(command, Command.COMMAND);
                 }
                 loaderArgs.add(arg.substring(1));

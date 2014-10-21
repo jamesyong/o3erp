@@ -26,14 +26,17 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.ofbiz.base.lang.LockedBy;
 import org.ofbiz.base.util.StringUtil;
+import org.ofbiz.base.util.UtilGenerics;
 import org.ofbiz.base.util.UtilURL;
 import org.ofbiz.base.util.UtilValidate;
 import org.ofbiz.base.util.UtilXml;
+import org.ofbiz.base.util.string.FlexibleStringExpander;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -87,11 +90,14 @@ public class ContainerConfig {
 
     public static String getPropertyValue(ContainerConfig.Container parentProp, String name, String defaultValue) {
         ContainerConfig.Container.Property prop = parentProp.getProperty(name);
+        String returnValue;
         if (prop == null || UtilValidate.isEmpty(prop.value)) {
-            return defaultValue;
+        	returnValue = defaultValue;
         } else {
-            return prop.value;
+        	returnValue = prop.value;
         }
+        Properties systemProps = System.getProperties();
+        return FlexibleStringExpander.expandString(returnValue, UtilGenerics.<String, Object>checkMap(systemProps));
     }
 
     public static int getPropertyValue(ContainerConfig.Container parentProp, String name, int defaultValue) {

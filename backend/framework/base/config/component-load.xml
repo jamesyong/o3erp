@@ -24,5 +24,5 @@ under the License.
     <load-components parent-directory="themes"/>
     <load-components parent-directory="applications"/>
     <load-components parent-directory="specialpurpose"/>
-    <load-components parent-directory="hot-deploy"/>
+    <load-components parent-directory="../../${sys:getProperty('ext.dir')}/hot-deploy"/>
 </component-loader>

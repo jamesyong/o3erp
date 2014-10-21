@@ -1,4 +1,4 @@
-package main
+package frontend
 
 import (
 	"github.com/julienschmidt/httprouter"
@@ -36,7 +36,7 @@ func HomeHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	http.Redirect(w, r, "/dashboard", http.StatusFound)
 }
 
-func main() {
+func Startup() {
 	mux := httprouter.New()
 	mux.GET("/", HomeHandler)
 	mux.GET("/login", handlers.LoginViewHandler)
@@ -48,7 +48,7 @@ func main() {
 	mux.GET("/menu", handlers.MenuHandler)
 
 	// handle static files
-	mux.ServeFiles("/assets/*filepath", http.Dir("./frontend/assets"))
+	mux.ServeFiles("/assets/*filepath", http.Dir("../o3erp/frontend/assets"))
 
 	var u *url.URL
 	var err error
@@ -107,7 +107,7 @@ func main() {
 	}()
 
 	// HTTPS
-	log.Fatal(http.ListenAndServeTLS(config.PORT_HTTPS, "frontend/cert.pem", "frontend/key.pem", app))
+	log.Fatal(http.ListenAndServeTLS(config.PORT_HTTPS, "../o3erp/frontend/cert.pem", "../o3erp/frontend/key.pem", app))
 
 }
 

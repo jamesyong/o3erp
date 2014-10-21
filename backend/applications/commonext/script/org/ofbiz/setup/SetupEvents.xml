@@ -672,7 +672,7 @@
             <field field="templateReader" type="java.io.Reader"/>
         </create-object>
         
-        <set field="tempDir" value="${sys:getProperty('ofbiz.home')}/runtime/tmp"/>
+        <set field="tempDir" value="${sys:getProperty('runtime.home')}/tmp"/>
 
         <call-bsh><![CDATA[
         sfileOut = new File(tempDir);

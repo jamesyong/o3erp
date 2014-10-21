@@ -74,6 +74,8 @@ public class Config {
     public List<Map<String, String>> loaders;
     public String logDir;
     public String ofbizHome;
+    public String extHome;
+    public String runtimeDir;
     public boolean requireCommJar = false;
     public boolean requireToolsJar = false;
     public boolean shutdownAfterLoad = false;
@@ -308,6 +310,26 @@ public class Config {
             }
         }
         System.setProperty("ofbiz.home", ofbizHome);
+        
+        // set ext.dir
+        if (args.length > 0) {
+            for (String arg : args) {
+                if (arg.toLowerCase().contains("ext.dir=")) {
+                    String extDir = arg.split("=")[1];
+                    System.setProperty("ext.dir", extDir);
+                    extHome = ofbizHome + "/../../" + extDir;
+                    runtimeDir = extHome + "/runtime";
+                    break;
+                }
+            }
+        }
+        if (runtimeDir==null){
+        	extHome = ofbizHome;
+        	runtimeDir = extHome +"/runtime";
+        }
+        System.setProperty("ext.home", extHome);
+        System.setProperty("runtime.home", runtimeDir);
+        
 
         // base config directory
         baseConfig = getOfbizHomeProp(props, "ofbiz.base.config", "framework/base/config");
@@ -364,7 +386,7 @@ public class Config {
         }
 
         // set the Derby system home
-        String derbyPath = getProp(props, "derby.system.home", "runtime/data/derby");
+        String derbyPath = getProp(props, "derby.system.home", runtimeDir+"/data/derby");
         System.setProperty("derby.system.home", derbyPath);
 
         // set the property to tell Log4J to use log4j.xml

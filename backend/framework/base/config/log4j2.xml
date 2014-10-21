@@ -4,8 +4,8 @@
         <Console name="stdout" target="SYSTEM_OUT">
             <PatternLayout pattern="%date{COMPACT} |%-20.20thread |%-20.20logger{1}|%level{length=1}| %message%n"/>
         </Console>
-        <RollingFile name="ofbiz" fileName="runtime/logs/ofbiz.log"
-                     filePattern="runtime/logs/ofbiz-%d{yyyy-MM-dd}-%i.log.zip">
+        <RollingFile name="ofbiz" fileName="${sys:runtime.home}/logs/ofbiz.log"
+                     filePattern="${sys:runtime.home}/logs/ofbiz-%d{yyyy-MM-dd}-%i.log.zip">
             <PatternLayout pattern="%date{COMPACT} |%-20.20thread |%-20.20logger{1}|%level{length=1}| %message%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
@@ -13,8 +13,8 @@
             </Policies>
             <DefaultRolloverStrategy max="4"/>
         </RollingFile>
-        <RollingFile name="external" fileName="runtime/logs/external.log"
-                     filePattern="runtime/logs/external-%d{yyyy-MM-dd}-%i.log.zip">
+        <RollingFile name="external" fileName="${sys:runtime.home}/logs/external.log"
+                     filePattern="${sys:runtime.home}/logs/external-%d{yyyy-MM-dd}-%i.log.zip">
             <PatternLayout pattern="%date{COMPACT} |%-20.20thread |%-20.20logger{1}|%level{length=1}| %message%n"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>

@@ -50,6 +50,7 @@ public final class FlexibleLocation {
         resolverMap.put("file", standardUrlResolver);
         resolverMap.put("classpath", new ClasspathLocationResolver());
         resolverMap.put("ofbizhome", new OFBizHomeLocationResolver());
+        resolverMap.put("exthome", new ExtHomeLocationResolver());
         resolverMap.put("component", new ComponentLocationResolver());
         try {
             Properties properties = UtilProperties.getProperties("locationresolvers.properties");

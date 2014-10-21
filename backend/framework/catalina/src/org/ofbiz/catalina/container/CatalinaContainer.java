@@ -192,10 +192,10 @@ public class CatalinaContainer implements Container {
         this.crossContext = ContainerConfig.getPropertyValue(cc, "apps-cross-context", true);
         this.distribute = ContainerConfig.getPropertyValue(cc, "apps-distributable", true);
 
-        this.catalinaRuntimeHome = ContainerConfig.getPropertyValue(cc, "catalina-runtime-home", "runtime/catalina");
+        this.catalinaRuntimeHome = ContainerConfig.getPropertyValue(cc, "catalina-runtime-home", System.getProperty("runtime.home")+"/catalina");
 
         // set catalina_home
-        System.setProperty(Globals.CATALINA_HOME_PROP, System.getProperty("ofbiz.home") + "/" + this.catalinaRuntimeHome);
+        System.setProperty(Globals.CATALINA_HOME_PROP, this.catalinaRuntimeHome );
         System.setProperty(Globals.CATALINA_BASE_PROP, System.getProperty(Globals.CATALINA_HOME_PROP));
 
         // create the instance of embedded Tomcat
@@ -323,7 +323,7 @@ public class CatalinaContainer implements Container {
         if (logDir != null) {
             al = new AccessLogValve();
             if (!logDir.startsWith("/")) {
-                logDir = System.getProperty("ofbiz.home") + "/" + logDir;
+                logDir = System.getProperty("ext.home") + "/" + logDir;
             }
             File logFile = new File(logDir);
             if (!logFile.isDirectory()) {

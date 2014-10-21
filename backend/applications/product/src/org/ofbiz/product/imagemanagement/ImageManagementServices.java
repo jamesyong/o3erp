@@ -655,7 +655,7 @@ public class ImageManagementServices {
         LocalDispatcher dispatcher = (LocalDispatcher) request.getAttribute("dispatcher");
         
         Map<String, String> formInput = FastMap.newInstance();
-        ServletFileUpload fu = new ServletFileUpload(new DiskFileItemFactory(10240, FileUtil.getFile("runtime/tmp")));
+        ServletFileUpload fu = new ServletFileUpload(new DiskFileItemFactory(10240, FileUtil.getFile( System.getProperty("runtime.home") + "/tmp")));
         List<FileItem> lst = null;
         try {
            lst = UtilGenerics.checkList(fu.parseRequest(request));

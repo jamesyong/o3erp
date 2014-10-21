@@ -26,7 +26,7 @@ under the License.
 
     <container name="component-container-test" loaders="test" class="org.ofbiz.base.container.ComponentContainer">
         <property name="ofbiz.instrumenterClassName" value="org.ofbiz.base.config.CoberturaInstrumenter"/>
-        <property name="ofbiz.instrumenterFile" value="runtime/logs/cobertura-components.dat"/>
+        <property name="ofbiz.instrumenterFile" value="${sys:getProperty('runtime.home')}/logs/cobertura-components.dat"/>
     </container>
 
     <container name="component-container-limited" loaders="limited" class="org.ofbiz.base.container.ComponentContainer">

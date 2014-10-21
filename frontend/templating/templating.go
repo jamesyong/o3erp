@@ -5,5 +5,5 @@ import (
 )
 
 var (
-	Render = render.New(render.Options{Directory: "frontend/templates"})
+	Render = render.New(render.Options{Directory: "../o3erp/frontend/templates"})
 )

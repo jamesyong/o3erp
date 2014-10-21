@@ -31,7 +31,11 @@ import java.net.URL;
 
 public class OFBizHomeLocationResolver implements LocationResolver {
 
-    public static final String envName = "ofbiz.home";
+    protected String envName;
+    
+    public OFBizHomeLocationResolver(){
+    	envName = "ofbiz.home";
+    }
 
     public URL resolveLocation(String location) throws MalformedURLException {
         String propValue = System.getProperty(envName);

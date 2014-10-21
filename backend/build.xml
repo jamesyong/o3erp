@@ -33,6 +33,9 @@ under the License.
     <import file="applications/build.xml" optional="true"/>
     <available file="specialpurpose/build.xml" property="specialpurpose.present"/>
     <import file="specialpurpose/build.xml" optional="true"/>
+	
+	<property name="ext.home" value="${basedir}/../../${ext.dir}"/>
+	<property name="runtime.home" value="${ext.home}/runtime"/>
 
     <!-- ================================================================== -->
     <!-- Initialization of all property settings                            -->
@@ -43,12 +46,12 @@ under the License.
     </target>
 
     <target name="dir-init">
-        <mkdir dir="runtime"/>
-        <mkdir dir="runtime/output"/>
-        <mkdir dir="runtime/logs"/>
-        <mkdir dir="runtime/logs/test-results"/>
-        <mkdir dir="runtime/data"/>
-        <mkdir dir="runtime/data/derby"/>
+        <mkdir dir="${runtime.home}"/>
+        <mkdir dir="${runtime.home}/output"/>
+        <mkdir dir="${runtime.home}/logs"/>
+        <mkdir dir="${runtime.home}/logs/test-results"/>
+        <mkdir dir="${runtime.home}/data"/>
+        <mkdir dir="${runtime.home}/data/derby"/>
 
         <condition property="isMac">
             <os family="mac"/>
@@ -113,19 +116,19 @@ under the License.
     <target name="clean-data"
             description="Clean all DB data (Derby) under runtime/data">
         <delete verbose="on" includeemptydirs="true">
-            <fileset dir="runtime/data" includes="**/*">
+            <fileset dir="${runtime.home}/data" includes="**/*">
                 <exclude name="README"/>
                 <exclude name="derby.properties"/>
             </fileset>
         </delete>
-        <delete file="runtime/data.zip"/>
-        <delete file="runtime/test-list-build.xml"/>
+        <delete file="${runtime.home}/data.zip"/>
+        <delete file="${runtime.home}/test-list-build.xml"/>
     </target>
 
     <target name="clean-logs"
             description="Clean all logs in runtime/logs">
         <delete verbose="on" includeemptydirs="true">
-            <fileset dir="runtime/logs" includes="**/*">
+            <fileset dir="${runtime.home}/logs" includes="**/*">
                 <exclude name="README"/>
             </fileset>
         </delete>
@@ -134,7 +137,7 @@ under the License.
     <target name="clean-output"
             description="Clean runtime/output directory">
         <delete verbose="on" includeemptydirs="true">
-            <fileset dir="runtime/output" includes="**/*"/>
+            <fileset dir="${runtime.home}/output" includes="**/*"/>
         </delete>
     </target>
 
@@ -147,7 +150,7 @@ under the License.
 
     <target name="clean-catalina"
             description="Clean Catalina data in runtime/catalina/work">
-        <delete dir="runtime/catalina/work"/>
+        <delete dir="${runtime.home}/catalina/work"/>
     </target>
 
     <target name="clean-cache"
@@ -160,14 +163,14 @@ under the License.
     <target name="clean-tempfiles"
             description="Remove files located in runtime/tempfiles (captcha, etc...)">
         <delete includeemptydirs="true">
-            <fileset dir="./runtime/tempfiles" includes="**/*"/>
+            <fileset dir="${runtime.home}/tempfiles" includes="**/*"/>
         </delete>
     </target>
 
     <target name="clean-search-indexes"
             description="Remove search indexes (e.g. Lucene indexes) created under runtime/indexes">
         <delete includeemptydirs="true">
-            <fileset dir="./runtime/indexes" includes="**/*" erroronmissingdir="false" />
+            <fileset dir="${runtime.home}/indexes" includes="**/*" erroronmissingdir="false" />
         </delete>
     </target>
 
@@ -197,24 +200,24 @@ under the License.
     <target name="svninfo"
         description="Update the Release-revision info in the footer. Note that you need a valid Internet connection and Subversion connected to the OFBiz repository for that ">
         <echo message="Creating svninfo..."/>
-        <exec executable="svn" dir="." output="runtime/svninfo_tmp.xml">
+        <exec executable="svn" dir="." output="${runtime.home}/svninfo_tmp.xml">
             <arg value="info"/>
             <arg value="--xml"/>
         </exec>
-        <xmlproperty file="runtime/svninfo_tmp.xml"/>
+        <xmlproperty file="${runtime.home}/svninfo_tmp.xml"/>
         <echo message="Rev:${info.entry.commit(revision)}"/>
         <basename property="releasePath" file="${info.entry.url}"/>
         <tstamp>
             <format property="dateTime" pattern="yyyy-MM-dd HH:mm:ss"/>
         </tstamp>
-        <echo message=" - Release-revision : ${releasePath}-r${info.entry.commit(revision)},  ${uiLabelMap.CommonBuiltOn} ${dateTime}" file="runtime/svninfo.ftl"/>
-        <delete file="runtime/svninfo_tmp.xml"/>
+        <echo message=" - Release-revision : ${releasePath}-r${info.entry.commit(revision)},  ${uiLabelMap.CommonBuiltOn} ${dateTime}" file="${runtime.home}/svninfo.ftl"/>
+        <delete file="${runtime.home}/svninfo_tmp.xml"/>
         <echo message="Done!"/>
     </target>
 
     <target name="clean-svninfo">
         <echo message="Resetting svninfo..."/>
-        <echo message=" " file="runtime/svninfo.ftl"/>
+        <echo message=" " file="${runtime.home}/svninfo.ftl"/>
         <echo message="Done!"/>
     </target>
 
@@ -260,20 +263,27 @@ under the License.
                 So the previous, simpler, behaviour is kept as long as you don't need
                 to build hot-deploy components in a specific order. -->
             <if>
-                <available file="hot-deploy/build.xml" property="useHotDeployBuild"/>
-                <then>
-                    <externalsubant target="@{target}">
-                        <filelist dir="." files="hot-deploy/build.xml"/>
-                    </externalsubant>
-                </then>
-                <else>
-                    <externalsubant target="@{target}">
-                        <fileset dir="${basedir}/hot-deploy" casesensitive="no">
-                            <exclude name="disabled/**"/>
-                            <include name="*/build.xml"/>
-                        </fileset>
-                    </externalsubant>
-                </else>
+            	<isset property="ext.home"/>
+            	<then>
+            	    <if>
+            	        <available property="useHotDeployBuild" file="${ext.home}/hot-deploy/build.xml" />
+            	        <then>
+                        	<externalsubant target="@{target}">
+                                <fileset dir="${ext.home}/hot-deploy" casesensitive="no">
+                                    <exclude name="disabled/**"/>
+                                    <include name="*/build.xml"/>
+                                </fileset>
+                            </externalsubant>
+                        </then>
+            	    	<!--
+                        <else>
+                        	<externalsubant target="@{target}">
+                                <filelist dir="." files="hot-deploy/build.xml"/>
+                            </externalsubant>
+                        </else>
+                        -->
+                    </if>
+           	    </then>
             </if>
         </sequential>
     </macrodef>
@@ -418,6 +428,7 @@ under the License.
             <jvmarg value="${memory.maxpermsize.param}"/>
             <arg value="start"/>
             <arg value="-portoffset=${portoffset}"/>
+        	<arg value="-ext.dir=${ext.dir}"/>
         </java>
     </target>
     <target name="start-batch"
@@ -490,6 +501,7 @@ under the License.
             <jvmarg value="${memory.max.param}"/>
             <jvmarg value="${memory.maxpermsize.param}"/>
             <arg value="install"/>
+        	<arg value="-ext.dir=${ext.dir}"/>
         </java>
     </target>
     <target name="load-demo-multitenant" depends="build"
@@ -757,16 +769,16 @@ under the License.
         sub-target of create-tenant, can't used alone => no description, to not clutter "ant -p" -->
     <target name="create-tenant-on-Derby" depends="get-tenant-data" if="isDerby">
         <echo message="Installing on Derby"/>
-        <copy file="${basedir}/framework/resources/templates/AdminNewTenantData-Derby.xml" tofile="runtime/tmp/tmpTenantData.xml">
+        <copy file="${basedir}/framework/resources/templates/AdminNewTenantData-Derby.xml" tofile="${runtime.home}/tmp/tmpTenantData.xml">
             <filterset>
                 <filter token="tenantId" value="${tenantId}"/>
                 <filter token="tenantName" value="${tenantName}"/>
             </filterset>
         </copy>
         <antcall target="load-file">
-            <param name="data-file" value="runtime/tmp/tmpTenantData.xml"/>
+            <param name="data-file" value="${runtime.home}/tmp/tmpTenantData.xml"/>
         </antcall>
-        <delete file="runtime/tmp/tmpTenantData.xml"/>
+        <delete file="${runtime.home}/tmp/tmpTenantData.xml"/>
         <antcall target="load-tenant-data-readers"/>
         <antcall target="load-tenant-admin-user-login">
             <param name="userLoginId" value="${tenantId}-admin"/>
@@ -777,7 +789,7 @@ under the License.
         sub-target of create-tenant, can't used alone => no description, to not clutter "ant -p" -->
     <target name="create-tenant-on-MySQL" depends="get-tenant-data" if="isMySQL">
         <echo message="Installing on MySQL"/>
-        <copy file="${basedir}/framework/resources/templates/AdminNewTenantData-MySQL.xml" tofile="runtime/tmp/tmpTenantData.xml">
+        <copy file="${basedir}/framework/resources/templates/AdminNewTenantData-MySQL.xml" tofile="${runtime.home}/tmp/tmpTenantData.xml">
             <filterset>
                 <filter token="tenantId" value="${tenantId}"/>
                 <filter token="tenantName" value="${tenantName}"/>
@@ -787,9 +799,9 @@ under the License.
             </filterset>
         </copy>
         <antcall target="load-file">
-            <param name="data-file" value="runtime/tmp/tmpTenantData.xml"/>
+            <param name="data-file" value="${runtime.home}/tmp/tmpTenantData.xml"/>
         </antcall>
-        <delete file="runtime/tmp/tmpTenantData.xml"/>
+        <delete file="${runtime.home}/tmp/tmpTenantData.xml"/>
         <antcall target="load-tenant-data-readers"/>
         <antcall target="load-tenant-admin-user-login">
             <param name="userLoginId" value="${tenantId}-admin"/>
@@ -800,7 +812,7 @@ under the License.
         sub-target of create-tenant, can't used alone => no description, to not clutter "ant -p" -->
     <target name="create-tenant-on-Oracle" depends="get-tenant-data" if="isOracle">
         <echo message="Installing on Oracle"/>
-        <copy file="${basedir}/framework/resources/templates/AdminNewTenantData-Oracle.xml" tofile="runtime/tmp/tmpTenantData.xml">
+        <copy file="${basedir}/framework/resources/templates/AdminNewTenantData-Oracle.xml" tofile="${runtime.home}/tmp/tmpTenantData.xml">
             <filterset>
                 <filter token="tenantId" value="${tenantId}"/>
                 <filter token="tenantName" value="${tenantName}"/>
@@ -810,9 +822,9 @@ under the License.
             </filterset>
         </copy>
         <antcall target="load-file">
-            <param name="data-file" value="runtime/tmp/tmpTenantData.xml"/>
+            <param name="data-file" value="${runtime.home}/tmp/tmpTenantData.xml"/>
         </antcall>
-        <delete file="runtime/tmp/tmpTenantData.xml"/>
+        <delete file="${runtime.home}/tmp/tmpTenantData.xml"/>
         <antcall target="load-tenant-data-readers"/>
         <antcall target="load-tenant-admin-user-login">
             <param name="userLoginId" value="${tenantId}-admin"/>
@@ -823,7 +835,7 @@ under the License.
         sub-target of create-tenant, can't used alone => no description, to not clutter "ant -p" -->
     <target name="create-tenant-on-PostgreSQL" depends="get-tenant-data" if="isPostgreSQL">
         <echo message="Installing on PostgreSQL"/>
-        <copy file="${basedir}/framework/resources/templates/AdminNewTenantData-PostgreSQL.xml" tofile="runtime/tmp/tmpTenantData.xml">
+        <copy file="${basedir}/framework/resources/templates/AdminNewTenantData-PostgreSQL.xml" tofile="${runtime.home}/tmp/tmpTenantData.xml">
             <filterset>
                 <filter token="tenantId" value="${tenantId}"/>
                 <filter token="tenantName" value="${tenantName}"/>
@@ -833,9 +845,9 @@ under the License.
             </filterset>
         </copy>
         <antcall target="load-file">
-            <param name="data-file" value="runtime/tmp/tmpTenantData.xml"/>
+            <param name="data-file" value="${runtime.home}/tmp/tmpTenantData.xml"/>
         </antcall>
-        <delete file="runtime/tmp/tmpTenantData.xml"/>
+        <delete file="${runtime.home}/tmp/tmpTenantData.xml"/>
         <antcall target="load-tenant-data-readers"/>
         <antcall target="load-tenant-admin-user-login">
             <param name="userLoginId" value="${tenantId}-admin"/>
@@ -868,16 +880,16 @@ under the License.
         <echo message="Password for tenant admin is 'ofbiz' must change on first login"/>
         <echo>------------------------------------</echo>
         <input addproperty="continueYN" message="Continue Y or N" validargs="N,n,Y,y"/>
-        <copy file="${basedir}/framework/resources/templates/AdminUserLoginData.xml" tofile="runtime/tmp/tmpUserLogin.xml">
+        <copy file="${basedir}/framework/resources/templates/AdminUserLoginData.xml" tofile="${runtime.home}/tmp/tmpUserLogin.xml">
             <filterset>
                 <filter token="userLoginId" value="${userLoginId}"/>
             </filterset>
         </copy>
         <antcall target="load-file">
-            <param name="data-file" value="runtime/tmp/tmpUserLogin.xml"/>
+            <param name="data-file" value="${runtime.home}/tmp/tmpUserLogin.xml"/>
             <param name="delegator" value="${delegatorId}"/>
         </antcall>
-        <delete file="runtime/tmp/tmpUserLogin.xml"/>
+        <delete file="${runtime.home}/tmp/tmpUserLogin.xml"/>
     </target>
     <target name="load-tenant-data-readers"
             description="Load data of given data-readers in the tenant database. Example: ./ant load-tenant-data-readers -Ddata-readers=seed,seed-initial -DtenantId=demo">
@@ -902,15 +914,15 @@ under the License.
                 <not><isset property="userLoginId"/></not>
             </condition>
         </fail>
-        <copy file="${basedir}/framework/resources/templates/AdminUserLoginData.xml" tofile="runtime/tmp/tmpUserLogin.xml">
+        <copy file="${basedir}/framework/resources/templates/AdminUserLoginData.xml" tofile="${runtime.home}/tmp/tmpUserLogin.xml">
             <filterset>
                 <filter token="userLoginId" value="${userLoginId}"/>
             </filterset>
         </copy>
         <antcall target="load-file">
-            <param name="data-file" value="runtime/tmp/tmpUserLogin.xml"/>
+            <param name="data-file" value="${runtime.home}/tmp/tmpUserLogin.xml"/>
         </antcall>
-        <delete file="runtime/tmp/tmpUserLogin.xml"/>
+        <delete file="${runtime.home}/tmp/tmpUserLogin.xml"/>
     </target>
     <target name="create-admin-user-login"
             description="Prompt for a user name, then create a user login with admin privileges and a temporary password equal to 'ofbiz'. After a successful login the user will be prompted for a new password. Note: this uses load-admin-user-login target">
@@ -927,12 +939,12 @@ under the License.
             <arg value="test"/>
             <env key="LC_ALL" value="C"/>
         </java>
-        <mkdir dir="runtime/logs/test-results/html"/>
-        <junitreport todir="runtime/logs/test-results">
-            <fileset dir="runtime/logs/test-results/">
+        <mkdir dir="${runtime.home}/logs/test-results/html"/>
+        <junitreport todir="${runtime.home}/logs/test-results">
+            <fileset dir="${runtime.home}/logs/test-results/">
                 <include name="*.xml"/>
             </fileset>
-            <report format="frames" todir="runtime/logs/test-results/html"/>
+            <report format="frames" todir="${runtime.home}/logs/test-results/html"/>
         </junitreport>
         <fail message="Test run was unsuccessful">
             <condition>
@@ -947,7 +959,7 @@ under the License.
             description="Download Cobertura and perform code coverage (same as run-tests). You will need a valid Internet connection to download cobertura"/>
 
     <target name="_check-separated-tests-already-setup">
-        <available file="runtime/test-list-build.xml" property="_separated-tests-already-setup"/>
+        <available file="${runtime.home}/test-list-build.xml" property="_separated-tests-already-setup"/>
     </target>
     <target name="_setup-separated-test-run" depends="_check-separated-tests-already-setup" unless="_separated-tests-already-setup">
         <java jar="ofbiz.jar" fork="true">
@@ -955,7 +967,7 @@ under the License.
             <jvmarg value="${memory.max.param}"/>
             <jvmarg value="${memory.maxpermsize.param}"/>
             <arg value="testlist"/>
-            <arg file="runtime/test-list-build.xml"/>
+            <arg file="${runtime.home}/test-list-build.xml"/>
             <arg value="-ant"/>
             <env key="LC_ALL" value="C"/>
         </java>
@@ -973,10 +985,10 @@ under the License.
             <arg value="-case=${test.case}"/>
             <env key="LC_ALL" value="C"/>
         </java>
-        <delete dir="runtime/logs/test-results/${test.component}-${test.case}"/>
-        <mkdir dir="runtime/logs/test-results/${test.component}-${test.case}"/>
-        <move todir="runtime/logs/test-results/${test.component}-${test.case}">
-            <fileset dir="runtime/logs/test-results" includes="*.xml"/>
+        <delete dir="${runtime.home}/logs/test-results/${test.component}-${test.case}"/>
+        <mkdir dir="${runtime.home}/logs/test-results/${test.component}-${test.case}"/>
+        <move todir="${runtime.home}/logs/test-results/${test.component}-${test.case}">
+            <fileset dir="${runtime.home}/logs/test-results" includes="*.xml"/>
         </move>
         <fail message="Test run was unsuccessful">
             <condition>
@@ -1003,10 +1015,10 @@ under the License.
             <arg value="-case=${test.case}"/>
             <env key="LC_ALL" value="C"/>
         </java>
-        <delete dir="runtime/logs/test-results/${test.component}-${test.case}"/>
-        <mkdir dir="runtime/logs/test-results/${test.component}-${test.case}"/>
-        <move todir="runtime/logs/test-results/${test.component}-${test.case}">
-            <fileset dir="runtime/logs/test-results" includes="*.xml"/>
+        <delete dir="${runtime.home}/logs/test-results/${test.component}-${test.case}"/>
+        <mkdir dir="${runtime.home}/logs/test-results/${test.component}-${test.case}"/>
+        <move todir="${runtime.home}/logs/test-results/${test.component}-${test.case}">
+            <fileset dir="${runtime.home}/logs/test-results" includes="*.xml"/>
         </move>
         <fail message="Test run was unsuccessful">
             <condition>
@@ -1039,14 +1051,14 @@ under the License.
     </target>
     <target name="run-test-list" depends="_setup-separated-test-run"
             description="Run all configured tests, stopping/starting ofbiz between each test">
-        <delete dir="runtime/logs/test-results"/>
-        <ant antfile="runtime/test-list-build.xml" target="all-tests"/>
+        <delete dir="${runtime.home}/logs/test-results"/>
+        <ant antfile="${runtime.home}/test-list-build.xml" target="all-tests"/>
     </target>
 
     <target name="cobertura-report"
             description="Generate a HTML code coverage report with cobertura, can be found in runtime/logs/cobertura-report">
-        <delete dir="runtime/logs/cobertura-report"/>
-        <mkdir dir="runtime/logs/cobertura-report"/>
+        <delete dir="${runtime.home}/logs/cobertura-report"/>
+        <mkdir dir="${runtime.home}/logs/cobertura-report"/>
         <taskdef resource="tasks.properties">
             <classpath>
                 <fileset dir="framework/base/lib">
@@ -1057,13 +1069,13 @@ under the License.
                 </fileset>
             </classpath>
         </taskdef>
-        <cobertura-merge datafile="runtime/logs/cobertura.dat">
-            <fileset dir="runtime/logs">
+        <cobertura-merge datafile="${runtime.home}/logs/cobertura.dat">
+            <fileset dir="${runtime.home}/logs">
                 <include name="cobertura-base.dat"/>
                 <include name="cobertura-components.dat"/>
             </fileset>
         </cobertura-merge>
-        <cobertura-report datafile="runtime/logs/cobertura.dat" destdir="runtime/logs/cobertura-report">
+        <cobertura-report datafile="${runtime.home}/logs/cobertura.dat" destdir="${runtime.home}/logs/cobertura-report">
             <dirset dir=".">
                 <include name="*/*/src"/>
             </dirset>
@@ -1074,8 +1086,8 @@ under the License.
 
     <target name="cobertura-report-xml"
             description="Generate a XML file from the cobertura report, this will be use by sonar">
-        <delete dir="runtime/logs/cobertura-report"/>
-        <mkdir dir="runtime/logs/cobertura-report"/>
+        <delete dir="${runtime.home}/logs/cobertura-report"/>
+        <mkdir dir="${runtime.home}/logs/cobertura-report"/>
         <taskdef resource="tasks.properties">
             <classpath>
                 <fileset dir="framework/base/lib">
@@ -1086,13 +1098,13 @@ under the License.
                 </fileset>
             </classpath>
         </taskdef>
-        <cobertura-merge datafile="runtime/logs/cobertura.dat">
-            <fileset dir="runtime/logs">
+        <cobertura-merge datafile="${runtime.home}/logs/cobertura.dat">
+            <fileset dir="${runtime.home}/logs">
                 <include name="cobertura-base.dat"/>
                 <include name="cobertura-components.dat"/>
             </fileset>
         </cobertura-merge>
-        <cobertura-report format="xml" datafile="runtime/logs/cobertura.dat" destdir="runtime/logs/cobertura-report">
+        <cobertura-report format="xml" datafile="${runtime.home}/logs/cobertura.dat" destdir="${runtime.home}/logs/cobertura-report">
             <dirset dir=".">
                 <include name="*/*/src"/>
             </dirset>
@@ -1102,11 +1114,11 @@ under the License.
 
     <target name="sonar" depends="download-sonar-ant-task, sonar-init"
             description="Sonar code analysis. You need a Sonar instance running to use it. More info on http://www.sonarsource.org/">
-        <exec executable="svn" dir="." output="runtime/svninfo_tmp.xml">
+        <exec executable="svn" dir="." output="${runtime.home}/svninfo_tmp.xml">
             <arg value="info"/>
             <arg value="--xml"/>
         </exec>
-        <xmlproperty file="runtime/svninfo_tmp.xml"/>
+        <xmlproperty file="${runtime.home}/svninfo_tmp.xml"/>
 
         <property name="sonar.sources" value="specialpurpose/appserver/src, framework/base/src, framework/bi/src,
             framework/catalina/src, framework/common/src, framework/datafile/src, framework/entity/src, framework/entityext/src,
@@ -1129,7 +1141,7 @@ under the License.
         <property name="sonar.projectName" value="Apache OFBiz" />
         <sonar:sonar key="org.apache:ofbiz" version="${info.entry.commit(revision)}" xmlns:sonar="antlib:org.sonar.ant:sonar"/>
         <property name="sonar.dynamicAnalysis" value="reuseReports" />
-        <property name="sonar.cobertura.reportPath" value="runtime/logs/cobertura-report/coverage.xml"/>
+        <property name="sonar.cobertura.reportPath" value="${runtime.home}/logs/cobertura-report/coverage.xml"/>
         <property name="sonar.java.source" value="1.6" />
         <property name="sonar.java.target" value="1.6" />
         <!-- default for jdbc url: jdbc:mysql://localhost:3306/sonar?useUnicode=true&amp;characterEncoding=utf8-->
@@ -1185,9 +1197,14 @@ under the License.
             Resource Name: ${component-resource-name}
             Webapp Name: ${webapp-name}
             Base permission: ${base-permission}
-            Folder: ${basedir}/hot-deploy/${component-name}
+            Folder: ${ext.dir}/hot-deploy/${component-name}
         </echo>
         <input addproperty="confirm-component-creation" message="Confirm: " defaultvalue="N" validargs="Y,N,y,n"/>
+    	<fail message="Ext Dir is mandatory">
+            <condition>
+                <equals arg1="${ext.dir}" arg2="" casesensitive="false" trim="yes"/>
+            </condition>
+        </fail>
         <fail message="Component creation cancelled by the user.">
             <condition>
                 <equals arg1="${confirm-component-creation}" arg2="N" casesensitive="false"/>
@@ -1219,88 +1236,88 @@ under the License.
             <filter token="base-permission" value="${base-permission}"/>
             <filter token="webapp-name" value="${webapp-name}"/>
         </filterset>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/config"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/data"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/data/helpdata"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/dtd"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/documents"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/entitydef"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/lib"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/patches"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/patches/staging"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/patches/production"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/script"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/servicedef"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/src"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/testdef"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/webapp"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/webapp/${webapp-name}"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/webapp/${webapp-name}/error"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/webapp/${webapp-name}/WEB-INF"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/webapp/${webapp-name}/WEB-INF/actions"/>
-        <mkdir dir="${basedir}/hot-deploy/${component-name}/widget/"/>
-        <copy file="${basedir}/framework/resources/templates/ofbiz-component.xml" tofile="${basedir}/hot-deploy/${component-name}/ofbiz-component.xml" encoding="utf-8">
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/config"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/data"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/data/helpdata"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/dtd"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/documents"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/entitydef"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/lib"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/patches"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/patches/staging"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/patches/production"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/script"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/servicedef"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/src"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/testdef"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/webapp"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/webapp/${webapp-name}"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/webapp/${webapp-name}/error"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/webapp/${webapp-name}/WEB-INF"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/webapp/${webapp-name}/WEB-INF/actions"/>
+        <mkdir dir="${ext.home}/hot-deploy/${component-name}/widget/"/>
+        <copy file="${basedir}/framework/resources/templates/ofbiz-component.xml" tofile="${ext.home}/hot-deploy/${component-name}/ofbiz-component.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/build.xml" tofile="${basedir}/hot-deploy/${component-name}/build.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/build.xml" tofile="${ext.home}/hot-deploy/${component-name}/build.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/TypeData.xml" tofile="${basedir}/hot-deploy/${component-name}/data/${component-resource-name}TypeData.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/TypeData.xml" tofile="${ext.home}/hot-deploy/${component-name}/data/${component-resource-name}TypeData.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/SecurityPermissionSeedData.xml" tofile="${basedir}/hot-deploy/${component-name}/data/${component-resource-name}SecurityPermissionSeedData.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/SecurityPermissionSeedData.xml" tofile="${ext.home}/hot-deploy/${component-name}/data/${component-resource-name}SecurityPermissionSeedData.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/SecurityGroupDemoData.xml" tofile="${basedir}/hot-deploy/${component-name}/data/${component-resource-name}SecurityGroupDemoData.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/SecurityGroupDemoData.xml" tofile="${ext.home}/hot-deploy/${component-name}/data/${component-resource-name}SecurityGroupDemoData.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/DemoData.xml" tofile="${basedir}/hot-deploy/${component-name}/data/${component-resource-name}DemoData.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/DemoData.xml" tofile="${ext.home}/hot-deploy/${component-name}/data/${component-resource-name}DemoData.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/HELP.xml" tofile="${basedir}/hot-deploy/${component-name}/data/helpdata/HELP_${component-resource-name}.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/HELP.xml" tofile="${ext.home}/hot-deploy/${component-name}/data/helpdata/HELP_${component-resource-name}.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/document.xml" tofile="${basedir}/hot-deploy/${component-name}/documents/${component-resource-name}.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/document.xml" tofile="${ext.home}/hot-deploy/${component-name}/documents/${component-resource-name}.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/entitymodel.xml" tofile="${basedir}/hot-deploy/${component-name}/entitydef/entitymodel.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/entitymodel.xml" tofile="${ext.home}/hot-deploy/${component-name}/entitydef/entitymodel.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/services.xml" tofile="${basedir}/hot-deploy/${component-name}/servicedef/services.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/services.xml" tofile="${ext.home}/hot-deploy/${component-name}/servicedef/services.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/Tests.xml" tofile="${basedir}/hot-deploy/${component-name}/testdef/${component-resource-name}Tests.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/Tests.xml" tofile="${ext.home}/hot-deploy/${component-name}/testdef/${component-resource-name}Tests.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/UiLabels.xml" tofile="${basedir}/hot-deploy/${component-name}/config/${component-resource-name}UiLabels.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/UiLabels.xml" tofile="${ext.home}/hot-deploy/${component-name}/config/${component-resource-name}UiLabels.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/index.jsp" tofile="${basedir}/hot-deploy/${component-name}/webapp/${webapp-name}/index.jsp" encoding="iso-8859-1">
+        <copy file="${basedir}/framework/resources/templates/index.jsp" tofile="${ext.home}/hot-deploy/${component-name}/webapp/${webapp-name}/index.jsp" encoding="iso-8859-1">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/error.jsp" tofile="${basedir}/hot-deploy/${component-name}/webapp/${webapp-name}/error/error.jsp" encoding="iso-8859-1">
+        <copy file="${basedir}/framework/resources/templates/error.jsp" tofile="${ext.home}/hot-deploy/${component-name}/webapp/${webapp-name}/error/error.jsp" encoding="iso-8859-1">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/controller.xml" tofile="${basedir}/hot-deploy/${component-name}/webapp/${webapp-name}/WEB-INF/controller.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/controller.xml" tofile="${ext.home}/hot-deploy/${component-name}/webapp/${webapp-name}/WEB-INF/controller.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/web.xml" tofile="${basedir}/hot-deploy/${component-name}/webapp/${webapp-name}/WEB-INF/web.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/web.xml" tofile="${ext.home}/hot-deploy/${component-name}/webapp/${webapp-name}/WEB-INF/web.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/CommonScreens.xml" tofile="${basedir}/hot-deploy/${component-name}/widget/CommonScreens.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/CommonScreens.xml" tofile="${ext.home}/hot-deploy/${component-name}/widget/CommonScreens.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/Screens.xml" tofile="${basedir}/hot-deploy/${component-name}/widget/${component-resource-name}Screens.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/Screens.xml" tofile="${ext.home}/hot-deploy/${component-name}/widget/${component-resource-name}Screens.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/Menus.xml" tofile="${basedir}/hot-deploy/${component-name}/widget/${component-resource-name}Menus.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/Menus.xml" tofile="${ext.home}/hot-deploy/${component-name}/widget/${component-resource-name}Menus.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/Forms.xml" tofile="${basedir}/hot-deploy/${component-name}/widget/${component-resource-name}Forms.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/Forms.xml" tofile="${ext.home}/hot-deploy/${component-name}/widget/${component-resource-name}Forms.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <echo>Component successfully created in folder ${basedir}/hot-deploy/${component-name}.
+        <echo>Component successfully created in folder ${ext.dir}/hot-deploy/${component-name}.
             Restart OFBiz and then visit the URL: http://localhost:9080/${webapp-name}
         </echo>
     </target>

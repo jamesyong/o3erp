@@ -26,7 +26,6 @@ under the License.
     <classpath type="jar" location="build/lib/*"/>
     <entity-resource type="data" reader-name="seed" loader="main" location="data/BiTypeData.xml"/>
     <entity-resource type="data" reader-name="seed" loader="main" location="data/BiSecurityPermissionSeedData.xml"/>
-    <entity-resource type="data" reader-name="demo" loader="main" location="data/BiSecurityGroupDemoData.xml"/>
     
     <service-resource type="model" loader="main" location="servicedef/services.xml"/>
 
