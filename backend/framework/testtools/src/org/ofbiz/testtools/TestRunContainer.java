@@ -49,7 +49,7 @@ import org.ofbiz.entity.Delegator;
 public class TestRunContainer implements Container {
 
     public static final String module = TestRunContainer.class.getName();
-    public static final String logDir = "runtime/logs/test-results/";
+    public static final String logDir = System.getProperty("runtime.home")+"/logs/test-results/";
 
     protected String configFile = null;
     protected String component = null;

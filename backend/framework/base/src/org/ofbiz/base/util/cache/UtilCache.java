@@ -109,7 +109,7 @@ public class UtilCache<K, V> implements Serializable, EvictionListener<Object, C
 
     /** Specifies whether or not to use file base stored for this cache, defaults to false */
     protected boolean useFileSystemStore = false;
-    private String fileStore = "runtime/data/utilcache";
+    private String fileStore = "../../"+System.getProperty("ext.dir")+"/runtime/data/utilcache";
 
     /** The set of listeners to receive notifications when items are modified (either deliberately or because they were expired). */
     protected Set<CacheListener<K, V>> listeners = new CopyOnWriteArraySet<CacheListener<K, V>>();
