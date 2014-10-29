@@ -1,23 +1,23 @@
 package o3erp.thrift.impl;
 
 import java.util.HashMap;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
 
+import o3erp.thrift.BaseService;
+
 import org.apache.thrift.TException;
-import org.ofbiz.base.util.UtilHttp;
 import org.ofbiz.base.util.UtilMisc;
-import org.ofbiz.base.util.UtilProperties;
 import org.ofbiz.base.util.UtilValidate;
 import org.ofbiz.entity.Delegator;
+import org.ofbiz.entity.GenericEntityException;
 import org.ofbiz.entity.GenericValue;
+import org.ofbiz.security.Security;
 import org.ofbiz.service.GenericServiceException;
 import org.ofbiz.service.LocalDispatcher;
 import org.ofbiz.service.ModelService;
 import org.ofbiz.service.ServiceContainer;
 import org.ofbiz.service.ServiceUtil;
-
-import o3erp.thrift.BaseService;
 
 public class BaseServiceHandler implements BaseService.Iface {
 	
@@ -50,7 +50,6 @@ public class BaseServiceHandler implements BaseService.Iface {
 					resultMap.put("partyId", userLogin.getString("partyId"));
 					
 				} else {
-					System.out.println(456);
 					resultMap.put(ModelService.RESPONSE_MESSAGE, ModelService.RESPOND_ERROR);
 					resultMap.put(ModelService.ERROR_MESSAGE, ServiceUtil.getErrorMessage(result));
 				}
@@ -61,6 +60,52 @@ public class BaseServiceHandler implements BaseService.Iface {
 		}
 				
 		return resultMap;
+	}
+
+	@Override
+	public Map<String, String> hasPermission(String loginName, List<String> permissions) throws TException {
+
+		LocalDispatcher dispatcher = ServiceContainer.getLocalDispatcher(this.delegator.getDelegatorName(), delegator);
+		Security security = dispatcher.getSecurity();
+		
+		GenericValue userLogin;
+		try {
+			userLogin = delegator.findOne("UserLogin", true, "userLoginId", loginName);
+		} catch (GenericEntityException e) {
+			e.printStackTrace();
+			throw new TException(e.getMessage());
+		}
+		
+		Map<String, String> result = new HashMap();
+		for(String permission : permissions){
+			result.put(permission, security.hasPermission(permission, userLogin)?"true":"false");
+		}
+		
+		return result;
+	}
+
+	@Override
+	public Map<String, String> hasEntityPermission(String userLoginId,	List<String> entities, List<String> actions) throws TException {
+
+		LocalDispatcher dispatcher = ServiceContainer.getLocalDispatcher(this.delegator.getDelegatorName(), delegator);
+		Security security = dispatcher.getSecurity();
+		
+		GenericValue userLogin;
+		try {
+			userLogin = delegator.findOne("UserLogin", true, "userLoginId", userLoginId);
+		} catch (GenericEntityException e) {
+			e.printStackTrace();
+			throw new TException(e.getMessage());
+		}
+		
+		Map<String, String> result = new HashMap();
+		for(int i=0, size=entities.size(); i<size; i++){
+			String entity = entities.get(i);
+			String action = actions.get(i);
+			result.put(entity+action, security.hasEntityPermission(entity, action, userLogin)?"true":"false");
+		}
+		
+		return result;
 	}
 
 }

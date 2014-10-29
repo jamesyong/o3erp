@@ -16,9 +16,18 @@ var _ = bytes.Equal
 
 type BaseService interface {
 	// Parameters:
-	//  - LoginName
+	//  - UserLoginId
 	//  - LoginPwd
-	UserLogin(loginName string, loginPwd string) (r map[string]string, err error)
+	UserLogin(userLoginId string, loginPwd string) (r map[string]string, err error)
+	// Parameters:
+	//  - UserLoginId
+	//  - Permissions
+	HasPermission(userLoginId string, permissions []string) (r map[string]string, err error)
+	// Parameters:
+	//  - UserLoginId
+	//  - Entities
+	//  - Actions
+	HasEntityPermission(userLoginId string, entities []string, actions []string) (r map[string]string, err error)
 }
 
 type BaseServiceClient struct {
@@ -48,16 +57,16 @@ func NewBaseServiceClientProtocol(t thrift.TTransport, iprot thrift.TProtocol, o
 }
 
 // Parameters:
-//  - LoginName
+//  - UserLoginId
 //  - LoginPwd
-func (p *BaseServiceClient) UserLogin(loginName string, loginPwd string) (r map[string]string, err error) {
-	if err = p.sendUserLogin(loginName, loginPwd); err != nil {
+func (p *BaseServiceClient) UserLogin(userLoginId string, loginPwd string) (r map[string]string, err error) {
+	if err = p.sendUserLogin(userLoginId, loginPwd); err != nil {
 		return
 	}
 	return p.recvUserLogin()
 }
 
-func (p *BaseServiceClient) sendUserLogin(loginName string, loginPwd string) (err error) {
+func (p *BaseServiceClient) sendUserLogin(userLoginId string, loginPwd string) (err error) {
 	oprot := p.OutputProtocol
 	if oprot == nil {
 		oprot = p.ProtocolFactory.GetProtocol(p.Transport)
@@ -68,8 +77,8 @@ func (p *BaseServiceClient) sendUserLogin(loginName string, loginPwd string) (er
 		return
 	}
 	args := UserLoginArgs{
-		LoginName: loginName,
-		LoginPwd:  loginPwd,
+		UserLoginId: userLoginId,
+		LoginPwd:    loginPwd,
 	}
 	if err = args.Write(oprot); err != nil {
 		return
@@ -118,6 +127,150 @@ func (p *BaseServiceClient) recvUserLogin() (value map[string]string, err error)
 	return
 }
 
+// Parameters:
+//  - UserLoginId
+//  - Permissions
+func (p *BaseServiceClient) HasPermission(userLoginId string, permissions []string) (r map[string]string, err error) {
+	if err = p.sendHasPermission(userLoginId, permissions); err != nil {
+		return
+	}
+	return p.recvHasPermission()
+}
+
+func (p *BaseServiceClient) sendHasPermission(userLoginId string, permissions []string) (err error) {
+	oprot := p.OutputProtocol
+	if oprot == nil {
+		oprot = p.ProtocolFactory.GetProtocol(p.Transport)
+		p.OutputProtocol = oprot
+	}
+	p.SeqId++
+	if err = oprot.WriteMessageBegin("hasPermission", thrift.CALL, p.SeqId); err != nil {
+		return
+	}
+	args := HasPermissionArgs{
+		UserLoginId: userLoginId,
+		Permissions: permissions,
+	}
+	if err = args.Write(oprot); err != nil {
+		return
+	}
+	if err = oprot.WriteMessageEnd(); err != nil {
+		return
+	}
+	return oprot.Flush()
+}
+
+func (p *BaseServiceClient) recvHasPermission() (value map[string]string, err error) {
+	iprot := p.InputProtocol
+	if iprot == nil {
+		iprot = p.ProtocolFactory.GetProtocol(p.Transport)
+		p.InputProtocol = iprot
+	}
+	_, mTypeId, seqId, err := iprot.ReadMessageBegin()
+	if err != nil {
+		return
+	}
+	if mTypeId == thrift.EXCEPTION {
+		error2 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error3 error
+		error3, err = error2.Read(iprot)
+		if err != nil {
+			return
+		}
+		if err = iprot.ReadMessageEnd(); err != nil {
+			return
+		}
+		err = error3
+		return
+	}
+	if p.SeqId != seqId {
+		err = thrift.NewTApplicationException(thrift.BAD_SEQUENCE_ID, "hasPermission failed: out of sequence response")
+		return
+	}
+	result := HasPermissionResult{}
+	if err = result.Read(iprot); err != nil {
+		return
+	}
+	if err = iprot.ReadMessageEnd(); err != nil {
+		return
+	}
+	value = result.GetSuccess()
+	return
+}
+
+// Parameters:
+//  - UserLoginId
+//  - Entities
+//  - Actions
+func (p *BaseServiceClient) HasEntityPermission(userLoginId string, entities []string, actions []string) (r map[string]string, err error) {
+	if err = p.sendHasEntityPermission(userLoginId, entities, actions); err != nil {
+		return
+	}
+	return p.recvHasEntityPermission()
+}
+
+func (p *BaseServiceClient) sendHasEntityPermission(userLoginId string, entities []string, actions []string) (err error) {
+	oprot := p.OutputProtocol
+	if oprot == nil {
+		oprot = p.ProtocolFactory.GetProtocol(p.Transport)
+		p.OutputProtocol = oprot
+	}
+	p.SeqId++
+	if err = oprot.WriteMessageBegin("hasEntityPermission", thrift.CALL, p.SeqId); err != nil {
+		return
+	}
+	args := HasEntityPermissionArgs{
+		UserLoginId: userLoginId,
+		Entities:    entities,
+		Actions:     actions,
+	}
+	if err = args.Write(oprot); err != nil {
+		return
+	}
+	if err = oprot.WriteMessageEnd(); err != nil {
+		return
+	}
+	return oprot.Flush()
+}
+
+func (p *BaseServiceClient) recvHasEntityPermission() (value map[string]string, err error) {
+	iprot := p.InputProtocol
+	if iprot == nil {
+		iprot = p.ProtocolFactory.GetProtocol(p.Transport)
+		p.InputProtocol = iprot
+	}
+	_, mTypeId, seqId, err := iprot.ReadMessageBegin()
+	if err != nil {
+		return
+	}
+	if mTypeId == thrift.EXCEPTION {
+		error4 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error5 error
+		error5, err = error4.Read(iprot)
+		if err != nil {
+			return
+		}
+		if err = iprot.ReadMessageEnd(); err != nil {
+			return
+		}
+		err = error5
+		return
+	}
+	if p.SeqId != seqId {
+		err = thrift.NewTApplicationException(thrift.BAD_SEQUENCE_ID, "hasEntityPermission failed: out of sequence response")
+		return
+	}
+	result := HasEntityPermissionResult{}
+	if err = result.Read(iprot); err != nil {
+		return
+	}
+	if err = iprot.ReadMessageEnd(); err != nil {
+		return
+	}
+	value = result.GetSuccess()
+	return
+}
+
 type BaseServiceProcessor struct {
 	processorMap map[string]thrift.TProcessorFunction
 	handler      BaseService
@@ -138,9 +291,11 @@ func (p *BaseServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFuncti
 
 func NewBaseServiceProcessor(handler BaseService) *BaseServiceProcessor {
 
-	self2 := &BaseServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
-	self2.processorMap["userLogin"] = &baseServiceProcessorUserLogin{handler: handler}
-	return self2
+	self6 := &BaseServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
+	self6.processorMap["userLogin"] = &baseServiceProcessorUserLogin{handler: handler}
+	self6.processorMap["hasPermission"] = &baseServiceProcessorHasPermission{handler: handler}
+	self6.processorMap["hasEntityPermission"] = &baseServiceProcessorHasEntityPermission{handler: handler}
+	return self6
 }
 
 func (p *BaseServiceProcessor) Process(iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -153,12 +308,12 @@ func (p *BaseServiceProcessor) Process(iprot, oprot thrift.TProtocol) (success b
 	}
 	iprot.Skip(thrift.STRUCT)
 	iprot.ReadMessageEnd()
-	x3 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function "+name)
+	x7 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function "+name)
 	oprot.WriteMessageBegin(name, thrift.EXCEPTION, seqId)
-	x3.Write(oprot)
+	x7.Write(oprot)
 	oprot.WriteMessageEnd()
 	oprot.Flush()
-	return false, x3
+	return false, x7
 
 }
 
@@ -182,7 +337,7 @@ func (p *baseServiceProcessorUserLogin) Process(seqId int32, iprot, oprot thrift
 	result := UserLoginResult{}
 	var retval map[string]string
 	var err2 error
-	if retval, err2 = p.handler.UserLogin(args.LoginName, args.LoginPwd); err2 != nil {
+	if retval, err2 = p.handler.UserLogin(args.UserLoginId, args.LoginPwd); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing userLogin: "+err2.Error())
 		oprot.WriteMessageBegin("userLogin", thrift.EXCEPTION, seqId)
 		x.Write(oprot)
@@ -210,19 +365,115 @@ func (p *baseServiceProcessorUserLogin) Process(seqId int32, iprot, oprot thrift
 	return true, err
 }
 
+type baseServiceProcessorHasPermission struct {
+	handler BaseService
+}
+
+func (p *baseServiceProcessorHasPermission) Process(seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := HasPermissionArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("hasPermission", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush()
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	result := HasPermissionResult{}
+	var retval map[string]string
+	var err2 error
+	if retval, err2 = p.handler.HasPermission(args.UserLoginId, args.Permissions); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing hasPermission: "+err2.Error())
+		oprot.WriteMessageBegin("hasPermission", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush()
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("hasPermission", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type baseServiceProcessorHasEntityPermission struct {
+	handler BaseService
+}
+
+func (p *baseServiceProcessorHasEntityPermission) Process(seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := HasEntityPermissionArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("hasEntityPermission", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush()
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	result := HasEntityPermissionResult{}
+	var retval map[string]string
+	var err2 error
+	if retval, err2 = p.handler.HasEntityPermission(args.UserLoginId, args.Entities, args.Actions); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing hasEntityPermission: "+err2.Error())
+		oprot.WriteMessageBegin("hasEntityPermission", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush()
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("hasEntityPermission", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
 // HELPER FUNCTIONS AND STRUCTURES
 
 type UserLoginArgs struct {
-	LoginName string `thrift:"loginName,1" json:"loginName"`
-	LoginPwd  string `thrift:"loginPwd,2" json:"loginPwd"`
+	UserLoginId string `thrift:"userLoginId,1" json:"userLoginId"`
+	LoginPwd    string `thrift:"loginPwd,2" json:"loginPwd"`
 }
 
 func NewUserLoginArgs() *UserLoginArgs {
 	return &UserLoginArgs{}
 }
 
-func (p *UserLoginArgs) GetLoginName() string {
-	return p.LoginName
+func (p *UserLoginArgs) GetUserLoginId() string {
+	return p.UserLoginId
 }
 
 func (p *UserLoginArgs) GetLoginPwd() string {
@@ -268,7 +519,7 @@ func (p *UserLoginArgs) ReadField1(iprot thrift.TProtocol) error {
 	if v, err := iprot.ReadString(); err != nil {
 		return fmt.Errorf("error reading field 1: %s", err)
 	} else {
-		p.LoginName = v
+		p.UserLoginId = v
 	}
 	return nil
 }
@@ -302,14 +553,14 @@ func (p *UserLoginArgs) Write(oprot thrift.TProtocol) error {
 }
 
 func (p *UserLoginArgs) writeField1(oprot thrift.TProtocol) (err error) {
-	if err := oprot.WriteFieldBegin("loginName", thrift.STRING, 1); err != nil {
-		return fmt.Errorf("%T write field begin error 1:loginName: %s", p, err)
+	if err := oprot.WriteFieldBegin("userLoginId", thrift.STRING, 1); err != nil {
+		return fmt.Errorf("%T write field begin error 1:userLoginId: %s", p, err)
 	}
-	if err := oprot.WriteString(string(p.LoginName)); err != nil {
-		return fmt.Errorf("%T.loginName (1) field write error: %s", p, err)
+	if err := oprot.WriteString(string(p.UserLoginId)); err != nil {
+		return fmt.Errorf("%T.userLoginId (1) field write error: %s", p, err)
 	}
 	if err := oprot.WriteFieldEnd(); err != nil {
-		return fmt.Errorf("%T write field end error 1:loginName: %s", p, err)
+		return fmt.Errorf("%T write field end error 1:userLoginId: %s", p, err)
 	}
 	return err
 }
@@ -391,19 +642,19 @@ func (p *UserLoginResult) ReadField0(iprot thrift.TProtocol) error {
 	tMap := make(map[string]string, size)
 	p.Success = tMap
 	for i := 0; i < size; i++ {
-		var _key4 string
+		var _key8 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_key4 = v
+			_key8 = v
 		}
-		var _val5 string
+		var _val9 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_val5 = v
+			_val9 = v
 		}
-		p.Success[_key4] = _val5
+		p.Success[_key8] = _val9
 	}
 	if err := iprot.ReadMapEnd(); err != nil {
 		return fmt.Errorf("error reading map end: %s", err)
@@ -458,4 +709,597 @@ func (p *UserLoginResult) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("UserLoginResult(%+v)", *p)
+}
+
+type HasPermissionArgs struct {
+	UserLoginId string   `thrift:"userLoginId,1" json:"userLoginId"`
+	Permissions []string `thrift:"permissions,2" json:"permissions"`
+}
+
+func NewHasPermissionArgs() *HasPermissionArgs {
+	return &HasPermissionArgs{}
+}
+
+func (p *HasPermissionArgs) GetUserLoginId() string {
+	return p.UserLoginId
+}
+
+func (p *HasPermissionArgs) GetPermissions() []string {
+	return p.Permissions
+}
+func (p *HasPermissionArgs) Read(iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(); err != nil {
+		return fmt.Errorf("%T read error: %s", p, err)
+	}
+	for {
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		if err != nil {
+			return fmt.Errorf("%T field %d read error: %s", p, fieldId, err)
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 1:
+			if err := p.ReadField1(iprot); err != nil {
+				return err
+			}
+		case 2:
+			if err := p.ReadField2(iprot); err != nil {
+				return err
+			}
+		default:
+			if err := iprot.Skip(fieldTypeId); err != nil {
+				return err
+			}
+		}
+		if err := iprot.ReadFieldEnd(); err != nil {
+			return err
+		}
+	}
+	if err := iprot.ReadStructEnd(); err != nil {
+		return fmt.Errorf("%T read struct end error: %s", p, err)
+	}
+	return nil
+}
+
+func (p *HasPermissionArgs) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return fmt.Errorf("error reading field 1: %s", err)
+	} else {
+		p.UserLoginId = v
+	}
+	return nil
+}
+
+func (p *HasPermissionArgs) ReadField2(iprot thrift.TProtocol) error {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
+		return fmt.Errorf("error reading list begin: %s", err)
+	}
+	tSlice := make([]string, 0, size)
+	p.Permissions = tSlice
+	for i := 0; i < size; i++ {
+		var _elem10 string
+		if v, err := iprot.ReadString(); err != nil {
+			return fmt.Errorf("error reading field 0: %s", err)
+		} else {
+			_elem10 = v
+		}
+		p.Permissions = append(p.Permissions, _elem10)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
+		return fmt.Errorf("error reading list end: %s", err)
+	}
+	return nil
+}
+
+func (p *HasPermissionArgs) Write(oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin("hasPermission_args"); err != nil {
+		return fmt.Errorf("%T write struct begin error: %s", p, err)
+	}
+	if err := p.writeField1(oprot); err != nil {
+		return err
+	}
+	if err := p.writeField2(oprot); err != nil {
+		return err
+	}
+	if err := oprot.WriteFieldStop(); err != nil {
+		return fmt.Errorf("write field stop error: %s", err)
+	}
+	if err := oprot.WriteStructEnd(); err != nil {
+		return fmt.Errorf("write struct stop error: %s", err)
+	}
+	return nil
+}
+
+func (p *HasPermissionArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("userLoginId", thrift.STRING, 1); err != nil {
+		return fmt.Errorf("%T write field begin error 1:userLoginId: %s", p, err)
+	}
+	if err := oprot.WriteString(string(p.UserLoginId)); err != nil {
+		return fmt.Errorf("%T.userLoginId (1) field write error: %s", p, err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return fmt.Errorf("%T write field end error 1:userLoginId: %s", p, err)
+	}
+	return err
+}
+
+func (p *HasPermissionArgs) writeField2(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("permissions", thrift.LIST, 2); err != nil {
+		return fmt.Errorf("%T write field begin error 2:permissions: %s", p, err)
+	}
+	if err := oprot.WriteListBegin(thrift.STRING, len(p.Permissions)); err != nil {
+		return fmt.Errorf("error writing list begin: %s", err)
+	}
+	for _, v := range p.Permissions {
+		if err := oprot.WriteString(string(v)); err != nil {
+			return fmt.Errorf("%T. (0) field write error: %s", p, err)
+		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return fmt.Errorf("error writing list end: %s", err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return fmt.Errorf("%T write field end error 2:permissions: %s", p, err)
+	}
+	return err
+}
+
+func (p *HasPermissionArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("HasPermissionArgs(%+v)", *p)
+}
+
+type HasPermissionResult struct {
+	Success map[string]string `thrift:"success,0" json:"success"`
+}
+
+func NewHasPermissionResult() *HasPermissionResult {
+	return &HasPermissionResult{}
+}
+
+var HasPermissionResult_Success_DEFAULT map[string]string
+
+func (p *HasPermissionResult) GetSuccess() map[string]string {
+	return p.Success
+}
+func (p *HasPermissionResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *HasPermissionResult) Read(iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(); err != nil {
+		return fmt.Errorf("%T read error: %s", p, err)
+	}
+	for {
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		if err != nil {
+			return fmt.Errorf("%T field %d read error: %s", p, fieldId, err)
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 0:
+			if err := p.ReadField0(iprot); err != nil {
+				return err
+			}
+		default:
+			if err := iprot.Skip(fieldTypeId); err != nil {
+				return err
+			}
+		}
+		if err := iprot.ReadFieldEnd(); err != nil {
+			return err
+		}
+	}
+	if err := iprot.ReadStructEnd(); err != nil {
+		return fmt.Errorf("%T read struct end error: %s", p, err)
+	}
+	return nil
+}
+
+func (p *HasPermissionResult) ReadField0(iprot thrift.TProtocol) error {
+	_, _, size, err := iprot.ReadMapBegin()
+	if err != nil {
+		return fmt.Errorf("error reading map begin: %s", err)
+	}
+	tMap := make(map[string]string, size)
+	p.Success = tMap
+	for i := 0; i < size; i++ {
+		var _key11 string
+		if v, err := iprot.ReadString(); err != nil {
+			return fmt.Errorf("error reading field 0: %s", err)
+		} else {
+			_key11 = v
+		}
+		var _val12 string
+		if v, err := iprot.ReadString(); err != nil {
+			return fmt.Errorf("error reading field 0: %s", err)
+		} else {
+			_val12 = v
+		}
+		p.Success[_key11] = _val12
+	}
+	if err := iprot.ReadMapEnd(); err != nil {
+		return fmt.Errorf("error reading map end: %s", err)
+	}
+	return nil
+}
+
+func (p *HasPermissionResult) Write(oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin("hasPermission_result"); err != nil {
+		return fmt.Errorf("%T write struct begin error: %s", p, err)
+	}
+	if err := p.writeField0(oprot); err != nil {
+		return err
+	}
+	if err := oprot.WriteFieldStop(); err != nil {
+		return fmt.Errorf("write field stop error: %s", err)
+	}
+	if err := oprot.WriteStructEnd(); err != nil {
+		return fmt.Errorf("write struct stop error: %s", err)
+	}
+	return nil
+}
+
+func (p *HasPermissionResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err := oprot.WriteFieldBegin("success", thrift.MAP, 0); err != nil {
+			return fmt.Errorf("%T write field begin error 0:success: %s", p, err)
+		}
+		if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRING, len(p.Success)); err != nil {
+			return fmt.Errorf("error writing map begin: %s", err)
+		}
+		for k, v := range p.Success {
+			if err := oprot.WriteString(string(k)); err != nil {
+				return fmt.Errorf("%T. (0) field write error: %s", p, err)
+			}
+			if err := oprot.WriteString(string(v)); err != nil {
+				return fmt.Errorf("%T. (0) field write error: %s", p, err)
+			}
+		}
+		if err := oprot.WriteMapEnd(); err != nil {
+			return fmt.Errorf("error writing map end: %s", err)
+		}
+		if err := oprot.WriteFieldEnd(); err != nil {
+			return fmt.Errorf("%T write field end error 0:success: %s", p, err)
+		}
+	}
+	return err
+}
+
+func (p *HasPermissionResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("HasPermissionResult(%+v)", *p)
+}
+
+type HasEntityPermissionArgs struct {
+	UserLoginId string   `thrift:"userLoginId,1" json:"userLoginId"`
+	Entities    []string `thrift:"entities,2" json:"entities"`
+	Actions     []string `thrift:"actions,3" json:"actions"`
+}
+
+func NewHasEntityPermissionArgs() *HasEntityPermissionArgs {
+	return &HasEntityPermissionArgs{}
+}
+
+func (p *HasEntityPermissionArgs) GetUserLoginId() string {
+	return p.UserLoginId
+}
+
+func (p *HasEntityPermissionArgs) GetEntities() []string {
+	return p.Entities
+}
+
+func (p *HasEntityPermissionArgs) GetActions() []string {
+	return p.Actions
+}
+func (p *HasEntityPermissionArgs) Read(iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(); err != nil {
+		return fmt.Errorf("%T read error: %s", p, err)
+	}
+	for {
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		if err != nil {
+			return fmt.Errorf("%T field %d read error: %s", p, fieldId, err)
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 1:
+			if err := p.ReadField1(iprot); err != nil {
+				return err
+			}
+		case 2:
+			if err := p.ReadField2(iprot); err != nil {
+				return err
+			}
+		case 3:
+			if err := p.ReadField3(iprot); err != nil {
+				return err
+			}
+		default:
+			if err := iprot.Skip(fieldTypeId); err != nil {
+				return err
+			}
+		}
+		if err := iprot.ReadFieldEnd(); err != nil {
+			return err
+		}
+	}
+	if err := iprot.ReadStructEnd(); err != nil {
+		return fmt.Errorf("%T read struct end error: %s", p, err)
+	}
+	return nil
+}
+
+func (p *HasEntityPermissionArgs) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return fmt.Errorf("error reading field 1: %s", err)
+	} else {
+		p.UserLoginId = v
+	}
+	return nil
+}
+
+func (p *HasEntityPermissionArgs) ReadField2(iprot thrift.TProtocol) error {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
+		return fmt.Errorf("error reading list begin: %s", err)
+	}
+	tSlice := make([]string, 0, size)
+	p.Entities = tSlice
+	for i := 0; i < size; i++ {
+		var _elem13 string
+		if v, err := iprot.ReadString(); err != nil {
+			return fmt.Errorf("error reading field 0: %s", err)
+		} else {
+			_elem13 = v
+		}
+		p.Entities = append(p.Entities, _elem13)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
+		return fmt.Errorf("error reading list end: %s", err)
+	}
+	return nil
+}
+
+func (p *HasEntityPermissionArgs) ReadField3(iprot thrift.TProtocol) error {
+	_, size, err := iprot.ReadListBegin()
+	if err != nil {
+		return fmt.Errorf("error reading list begin: %s", err)
+	}
+	tSlice := make([]string, 0, size)
+	p.Actions = tSlice
+	for i := 0; i < size; i++ {
+		var _elem14 string
+		if v, err := iprot.ReadString(); err != nil {
+			return fmt.Errorf("error reading field 0: %s", err)
+		} else {
+			_elem14 = v
+		}
+		p.Actions = append(p.Actions, _elem14)
+	}
+	if err := iprot.ReadListEnd(); err != nil {
+		return fmt.Errorf("error reading list end: %s", err)
+	}
+	return nil
+}
+
+func (p *HasEntityPermissionArgs) Write(oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin("hasEntityPermission_args"); err != nil {
+		return fmt.Errorf("%T write struct begin error: %s", p, err)
+	}
+	if err := p.writeField1(oprot); err != nil {
+		return err
+	}
+	if err := p.writeField2(oprot); err != nil {
+		return err
+	}
+	if err := p.writeField3(oprot); err != nil {
+		return err
+	}
+	if err := oprot.WriteFieldStop(); err != nil {
+		return fmt.Errorf("write field stop error: %s", err)
+	}
+	if err := oprot.WriteStructEnd(); err != nil {
+		return fmt.Errorf("write struct stop error: %s", err)
+	}
+	return nil
+}
+
+func (p *HasEntityPermissionArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("userLoginId", thrift.STRING, 1); err != nil {
+		return fmt.Errorf("%T write field begin error 1:userLoginId: %s", p, err)
+	}
+	if err := oprot.WriteString(string(p.UserLoginId)); err != nil {
+		return fmt.Errorf("%T.userLoginId (1) field write error: %s", p, err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return fmt.Errorf("%T write field end error 1:userLoginId: %s", p, err)
+	}
+	return err
+}
+
+func (p *HasEntityPermissionArgs) writeField2(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("entities", thrift.LIST, 2); err != nil {
+		return fmt.Errorf("%T write field begin error 2:entities: %s", p, err)
+	}
+	if err := oprot.WriteListBegin(thrift.STRING, len(p.Entities)); err != nil {
+		return fmt.Errorf("error writing list begin: %s", err)
+	}
+	for _, v := range p.Entities {
+		if err := oprot.WriteString(string(v)); err != nil {
+			return fmt.Errorf("%T. (0) field write error: %s", p, err)
+		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return fmt.Errorf("error writing list end: %s", err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return fmt.Errorf("%T write field end error 2:entities: %s", p, err)
+	}
+	return err
+}
+
+func (p *HasEntityPermissionArgs) writeField3(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("actions", thrift.LIST, 3); err != nil {
+		return fmt.Errorf("%T write field begin error 3:actions: %s", p, err)
+	}
+	if err := oprot.WriteListBegin(thrift.STRING, len(p.Actions)); err != nil {
+		return fmt.Errorf("error writing list begin: %s", err)
+	}
+	for _, v := range p.Actions {
+		if err := oprot.WriteString(string(v)); err != nil {
+			return fmt.Errorf("%T. (0) field write error: %s", p, err)
+		}
+	}
+	if err := oprot.WriteListEnd(); err != nil {
+		return fmt.Errorf("error writing list end: %s", err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return fmt.Errorf("%T write field end error 3:actions: %s", p, err)
+	}
+	return err
+}
+
+func (p *HasEntityPermissionArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("HasEntityPermissionArgs(%+v)", *p)
+}
+
+type HasEntityPermissionResult struct {
+	Success map[string]string `thrift:"success,0" json:"success"`
+}
+
+func NewHasEntityPermissionResult() *HasEntityPermissionResult {
+	return &HasEntityPermissionResult{}
+}
+
+var HasEntityPermissionResult_Success_DEFAULT map[string]string
+
+func (p *HasEntityPermissionResult) GetSuccess() map[string]string {
+	return p.Success
+}
+func (p *HasEntityPermissionResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *HasEntityPermissionResult) Read(iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(); err != nil {
+		return fmt.Errorf("%T read error: %s", p, err)
+	}
+	for {
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		if err != nil {
+			return fmt.Errorf("%T field %d read error: %s", p, fieldId, err)
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 0:
+			if err := p.ReadField0(iprot); err != nil {
+				return err
+			}
+		default:
+			if err := iprot.Skip(fieldTypeId); err != nil {
+				return err
+			}
+		}
+		if err := iprot.ReadFieldEnd(); err != nil {
+			return err
+		}
+	}
+	if err := iprot.ReadStructEnd(); err != nil {
+		return fmt.Errorf("%T read struct end error: %s", p, err)
+	}
+	return nil
+}
+
+func (p *HasEntityPermissionResult) ReadField0(iprot thrift.TProtocol) error {
+	_, _, size, err := iprot.ReadMapBegin()
+	if err != nil {
+		return fmt.Errorf("error reading map begin: %s", err)
+	}
+	tMap := make(map[string]string, size)
+	p.Success = tMap
+	for i := 0; i < size; i++ {
+		var _key15 string
+		if v, err := iprot.ReadString(); err != nil {
+			return fmt.Errorf("error reading field 0: %s", err)
+		} else {
+			_key15 = v
+		}
+		var _val16 string
+		if v, err := iprot.ReadString(); err != nil {
+			return fmt.Errorf("error reading field 0: %s", err)
+		} else {
+			_val16 = v
+		}
+		p.Success[_key15] = _val16
+	}
+	if err := iprot.ReadMapEnd(); err != nil {
+		return fmt.Errorf("error reading map end: %s", err)
+	}
+	return nil
+}
+
+func (p *HasEntityPermissionResult) Write(oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin("hasEntityPermission_result"); err != nil {
+		return fmt.Errorf("%T write struct begin error: %s", p, err)
+	}
+	if err := p.writeField0(oprot); err != nil {
+		return err
+	}
+	if err := oprot.WriteFieldStop(); err != nil {
+		return fmt.Errorf("write field stop error: %s", err)
+	}
+	if err := oprot.WriteStructEnd(); err != nil {
+		return fmt.Errorf("write struct stop error: %s", err)
+	}
+	return nil
+}
+
+func (p *HasEntityPermissionResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err := oprot.WriteFieldBegin("success", thrift.MAP, 0); err != nil {
+			return fmt.Errorf("%T write field begin error 0:success: %s", p, err)
+		}
+		if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRING, len(p.Success)); err != nil {
+			return fmt.Errorf("error writing map begin: %s", err)
+		}
+		for k, v := range p.Success {
+			if err := oprot.WriteString(string(k)); err != nil {
+				return fmt.Errorf("%T. (0) field write error: %s", p, err)
+			}
+			if err := oprot.WriteString(string(v)); err != nil {
+				return fmt.Errorf("%T. (0) field write error: %s", p, err)
+			}
+		}
+		if err := oprot.WriteMapEnd(); err != nil {
+			return fmt.Errorf("error writing map end: %s", err)
+		}
+		if err := oprot.WriteFieldEnd(); err != nil {
+			return fmt.Errorf("%T write field end error 0:success: %s", p, err)
+		}
+	}
+	return err
+}
+
+func (p *HasEntityPermissionResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("HasEntityPermissionResult(%+v)", *p)
 }

@@ -72,6 +72,14 @@ public interface Security {
      * @return Returns true if the currently logged in userLogin has the specified permission, otherwise returns false.
      */
     public boolean hasPermission(String permission, GenericValue userLogin);
+    
+    /**
+     * Checks to see if the userLogin has the passed group id.
+     * @param groupId The ID of the group
+     * @param userLogin The userLogin object for user to check against.
+     * @return
+     */
+    public boolean hasSecurityGroup(String groupId, GenericValue userLogin);
 
     /**
      * Like hasPermission above, except it has functionality specific to Entity permissions. Checks the entity for the

@@ -7,7 +7,27 @@ import (
 	"github.com/jamesyong/o3erp/frontend/thriftlib"
 )
 
-func Login(loginName string, loginPwd string) (map[string]string, error) {
+type ThriftFunc func(client *thriftlib.BaseServiceClient) (map[string]string, error)
+
+func GetLoginFunction(userLoginId string, loginPwd string) ThriftFunc {
+	return func(client *thriftlib.BaseServiceClient) (map[string]string, error) {
+		return client.UserLogin(userLoginId, loginPwd)
+	}
+}
+
+func GetHasPermissionFunction(userLoginId string, permissions []string) ThriftFunc {
+	return func(client *thriftlib.BaseServiceClient) (map[string]string, error) {
+		return client.HasPermission(userLoginId, permissions)
+	}
+}
+
+func GetHasEntityPermissionFunction(userLoginId string, entities []string, actions []string) ThriftFunc {
+	return func(client *thriftlib.BaseServiceClient) (map[string]string, error) {
+		return client.HasEntityPermission(userLoginId, entities, actions)
+	}
+}
+
+func RunThriftService(thriftFunc ThriftFunc) (map[string]string, error) {
 
 	//addr := flag.String("addr", "localhost:9090", "Address to listen to")
 	//secure := flag.Bool("secure", false, "Use tls secure transport")
@@ -41,9 +61,5 @@ func Login(loginName string, loginPwd string) (map[string]string, error) {
 	}
 	client := thriftlib.NewBaseServiceClientFactory(transport, protocolFactory)
 
-	return handleClient(client, loginName, loginPwd)
-}
-
-func handleClient(client *thriftlib.BaseServiceClient, loginName string, loginPwd string) (map[string]string, error) {
-	return client.UserLogin(loginName, loginPwd)
+	return thriftFunc(client)
 }

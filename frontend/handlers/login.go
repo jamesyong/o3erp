@@ -28,12 +28,11 @@ func LoginViewHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 
 func LoginHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
-	email := r.FormValue("email")
+	userLoginId := r.FormValue("email")
 	password := r.FormValue("password")
+	if userLoginId != "" && password != "" {
 
-	if email != "" && password != "" {
-
-		msg, err := helper.Login("admin", "ofbiz")
+		msg, err := helper.RunThriftService(helper.GetLoginFunction(userLoginId, password))
 		if err != nil {
 			log.Println("error: ", err)
 		} else {
@@ -47,6 +46,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 			// Set some session values.
 			log.Println("partyId:", msg["partyId"])
 			session.Values[sessions.PARTY_ID] = msg["partyId"]
+			session.Values[sessions.USER_LOGIN_ID] = userLoginId
 			// Save it.
 			session.Save(r, w)
 

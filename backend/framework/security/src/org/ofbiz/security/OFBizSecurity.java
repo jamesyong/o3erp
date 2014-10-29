@@ -36,6 +36,7 @@ import org.ofbiz.entity.GenericValue;
 import org.ofbiz.entity.condition.EntityCondition;
 import org.ofbiz.entity.condition.EntityConditionList;
 import org.ofbiz.entity.condition.EntityExpr;
+import org.ofbiz.entity.condition.EntityJoinOperator;
 import org.ofbiz.entity.condition.EntityOperator;
 import org.ofbiz.entity.util.EntityUtil;
 
@@ -89,10 +90,27 @@ public class OFBizSecurity implements Security {
      * @see org.ofbiz.security.Security#securityGroupPermissionExists(java.lang.String, java.lang.String)
      */
     public boolean securityGroupPermissionExists(String groupId, String permission) {
-        GenericValue securityGroupPermissionValue = delegator.makeValue("SecurityGroupPermission",
-                UtilMisc.toMap("groupId", groupId, "permissionId", permission));
         try {
-            return delegator.findOne(securityGroupPermissionValue.getEntityName(), securityGroupPermissionValue, false) != null;
+        	String adminPermission = null;
+        	if (!permission.endsWith("_ADMIN")){
+        		if (permission.contains("_")){
+        			adminPermission = permission.substring(0, permission.lastIndexOf("_"))+"_ADMIN";
+        		} 
+        	}
+        	EntityCondition ec = EntityCondition.makeCondition(
+        			UtilMisc.toList(
+        					EntityCondition.makeCondition("groupId", groupId),
+        					EntityCondition.makeCondition(
+        		        			UtilMisc.toList(
+        		        					EntityCondition.makeCondition("permissionId", permission),
+        		        					EntityCondition.makeCondition("permissionId", adminPermission)
+        		        			),
+        		        			EntityJoinOperator.OR
+        		        		)
+        			)
+        		);
+        	List<GenericValue> list = delegator.findList("SecurityGroupPermission", ec, null, null, null, true);
+            return UtilValidate.isNotEmpty(list);
         } catch (GenericEntityException e) {
             Debug.logWarning(e, module);
             return false;
@@ -126,6 +144,24 @@ public class OFBizSecurity implements Security {
 
         return false;
     }
+    
+    /**
+     * @see org.ofbiz.security.Security#hasSecurityGroup(java.lang.String, org.ofbiz.entity.GenericValue)
+     */
+	@Override
+	public boolean hasSecurityGroup(String groupId, GenericValue userLogin) {
+		if (userLogin == null) return false;
+
+        Iterator<GenericValue> iterator = findUserLoginSecurityGroupByUserLoginId(userLogin.getString("userLoginId"));
+        GenericValue userLoginSecurityGroup = null;
+
+        while (iterator.hasNext()) {
+            userLoginSecurityGroup = iterator.next();
+            if (userLoginSecurityGroup.getString("groupId").equals(groupId)) return true;
+        }
+
+        return false;
+	}
 
     /**
      * @see org.ofbiz.security.Security#hasEntityPermission(java.lang.String, java.lang.String, javax.servlet.http.HttpSession)

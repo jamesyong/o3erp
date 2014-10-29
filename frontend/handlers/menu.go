@@ -4,7 +4,10 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
+	"github.com/jamesyong/o3erp/frontend/helper"
+	"github.com/jamesyong/o3erp/frontend/sessions"
 	"github.com/julienschmidt/httprouter"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -25,7 +28,7 @@ type Menu struct {
 	XMLName   xml.Name   `xml:"menu" json:"-"`
 	Id        string     `xml:"id,attr" json:"id"`
 	Name      string     `xml:"name,attr" json:"name"`
-	Role      string     `xml:"role,attr" json:"role"`
+	P         string     `xml:"p,attr" json:"p"`
 	Url       UrlGroup   `xml:"url" json:"url"`
 	Directory bool       `xml:"directory,attr" json:"directory"`
 	MenuItems []MenuItem `xml:"menu-item" json:",omitempty"`
@@ -43,49 +46,49 @@ type MenuItem struct {
 
 func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	data := `<menuGroup>
-	<menu name="AP" directory="true">
+	<menu name="AP" directory="true" p="ACCOUNTING_VIEW">
 		<url type='iframe'>/ap/control/main</url>
     </menu>
-	<menu name="AR" directory="true">
+	<menu name="AR" directory="true" p="ACCOUNTING_VIEW">
 		<url type='iframe'>/ar/control/main</url>
     </menu>
-	<menu name="Accounting" directory="true">
+	<menu name="Accounting" directory="true" p="ACCOUNTING_VIEW">
 		<url type='iframe'>/accounting/control/main</url>
     </menu>
-	<menu name="Catalog" directory="true">
+	<menu name="Catalog" directory="true" p="CATALOG_VIEW">
 		<url type='iframe'>/catalog/control/main</url>
     </menu>
-	<menu name="Content" directory="true">
+	<menu name="Content" directory="true" p="CONTENT_VIEW">
 		<url type='iframe'>/content/control/main</url>
     </menu>
-	<menu name="Facility" directory="true">
+	<menu name="Facility" directory="true" p="FACILITY_VIEW">
 		<url type='iframe'>/facility/control/main</url>
     </menu>
-	<menu name="HR" directory="true">
+	<menu name="HR" directory="true" p="HUMANRES_VIEW">
 		<url type='iframe'>/humanres/control/main</url>
     </menu>
-	<menu name="Manufacturing" directory="true">
+	<menu name="Manufacturing" directory="true" p="MANUFACTURING_VIEW">
 		<url type='iframe'>/manufacturing/control/main</url>
     </menu>
-	<menu name="Marketing" directory="true">
+	<menu name="Marketing" directory="true" p="MARKETING_VIEW">
 		<url type='iframe'>/marketing/control/main</url>
     </menu>
-	<menu name="Order" directory="true">
+	<menu name="Order" directory="true" p="ORDERMGR_VIEW">
 		<url type='iframe'>/ordermgr/control/main</url>
     </menu>
-	<menu name="Party" directory="true">
+	<menu name="Party" directory="true" p="PARTYMGR_VIEW">
 		<url type='iframe'>/partymgr/control/main</url>
     </menu>
-	<menu name="SFA" directory="true">
+	<menu name="SFA" directory="true" p="SFA_VIEW">
 		<url type='iframe'>/sfa/control/main</url>
     </menu>
-	<menu name="Work Effort" directory="true">
+	<menu name="Work Effort" directory="true" p="WORKEFFORTMGR_VIEW">
 		<url type='iframe'>/workeffort/control/main</url>
     </menu>
-	<menu name="Business Intelligence" directory="true">
+	<menu name="Business Intelligence" directory="true" p="BI_VIEW">
 		<url type='iframe'>/bi/control/main</url>
     </menu>
-	<menu name="Web Tools" directory="true">
+	<menu name="Web Tools" directory="true" p="WEBTOOLS_VIEW">
 		<url type='iframe'>/webtools/control/main</url>
     </menu>
 	</menuGroup>`
@@ -105,73 +108,122 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		}
 		os.Stdout.Write(output) */
 
-	counter := 1
-	var buffer bytes.Buffer
-	buffer.WriteString("{ id:'root', name:'root'}")
-	iterateMenu(menusGroup[0].Menus, &buffer, "root", &counter)
-	w.Header().Set("Content-Type", "text/json")
-	w.Write([]byte("[" + buffer.String() + "]"))
+	session, _ := sessions.SessionStore.Get(r, "session-name")
+	userLoginId := session.Values[sessions.USER_LOGIN_ID]
+	if userLoginId != nil {
+
+		permissionSet := make(map[string]struct{})
+		iterateMenuGetPerm(menusGroup[0].Menus, &permissionSet)
+
+		// convert permission from set to array
+		permissions := []string{}
+		for k := range permissionSet {
+			permissions = append(permissions, k)
+		}
+
+		permissionMap, err := helper.RunThriftService(helper.GetHasPermissionFunction(userLoginId.(string), permissions))
+		if err != nil {
+			log.Println("error: ", err)
+		} else {
+			// log.Println("success: ", permissionMap, err)
+		}
+
+		counter := 1
+		var buffer bytes.Buffer
+		buffer.WriteString("{ id:'root', name:'root'}")
+		iterateMenu(menusGroup[0].Menus, &buffer, "root", &counter, permissionMap)
+		w.Header().Set("Content-Type", "text/json")
+		w.Write([]byte("[" + buffer.String() + "]"))
+
+	}
+
 }
 
-func iterateMenu(menus []Menu, buffer *bytes.Buffer, parent string, counter *int) {
+func iterateMenu(menus []Menu, buffer *bytes.Buffer, parent string, counter *int, permissionMap map[string]string) {
 	for _, menu := range menus {
-		buffer.WriteString(",{")
-		if menu.Id == "" {
-			*counter = *counter + 1
-			menu.Id = strconv.Itoa(*counter)
-		}
-		buffer.WriteString(" id:'" + menu.Id + "'")
-		if menu.Name != "" {
-			buffer.WriteString(", name:'" + menu.Name + "'")
-		}
-		if menu.Role != "" {
-			buffer.WriteString(", role:'" + menu.Role + "'")
-		}
-		if &menu.Url != nil {
-			buffer.WriteString(", url:'" + menu.Url.Href + "'")
-			if menu.Url.Type != "" {
-				buffer.WriteString(", urlType:'" + menu.Url.Type + "'")
+		if menu.P == "" || permissionMap[menu.P] == "true" {
+			buffer.WriteString(",{")
+			if menu.Id == "" {
+				*counter = *counter + 1
+				menu.Id = strconv.Itoa(*counter)
 			}
+			buffer.WriteString(" id:'" + menu.Id + "'")
+			if menu.Name != "" {
+				buffer.WriteString(", name:'" + menu.Name + "'")
+			}
+			if menu.P != "" {
+				buffer.WriteString(", p:'" + menu.P + "'")
+			}
+			if &menu.Url != nil {
+				buffer.WriteString(", url:'" + menu.Url.Href + "'")
+				if menu.Url.Type != "" {
+					buffer.WriteString(", urlType:'" + menu.Url.Type + "'")
+				}
+			}
+			if menu.Directory != false {
+				buffer.WriteString(", directory:'" + btos(menu.Directory) + "'")
+			}
+			buffer.WriteString(", parent:'" + parent + "'")
+			buffer.WriteString("}")
 		}
-		if menu.Directory != false {
-			buffer.WriteString(", directory:'" + btos(menu.Directory) + "'")
-		}
-		buffer.WriteString(", parent:'" + parent + "'")
-		buffer.WriteString("}")
 		if menu.MenuItems != nil {
-			iterateMenuItem(menu.MenuItems, buffer, menu.Id, counter)
+			iterateMenuItem(menu.MenuItems, buffer, menu.Id, counter, permissionMap)
 		}
 	}
 }
 
-func iterateMenuItem(menuItems []MenuItem, buffer *bytes.Buffer, parent string, counter *int) {
+func iterateMenuItem(menuItems []MenuItem, buffer *bytes.Buffer, parent string, counter *int, permissionMap map[string]string) {
 	for _, menuItem := range menuItems {
-		buffer.WriteString(",{")
-		if menuItem.Id == "" {
-			*counter = *counter + 1
-			menuItem.Id = strconv.Itoa(*counter)
-		}
-		buffer.WriteString(" id:'" + menuItem.Id + "'")
-
-		if menuItem.Name != "" {
-			buffer.WriteString(", name:'" + menuItem.Name + "'")
-		}
-		if menuItem.P != "" {
-			buffer.WriteString(", p:'" + menuItem.P + "'")
-		}
-		if &menuItem.Url != nil {
-			buffer.WriteString(", url:'" + menuItem.Url.Href + "'")
-			if menuItem.Url.Type != "" {
-				buffer.WriteString(", urlType:'" + menuItem.Url.Type + "'")
+		if menuItem.P == "" || permissionMap[menuItem.P] == "true" {
+			buffer.WriteString(",{")
+			if menuItem.Id == "" {
+				*counter = *counter + 1
+				menuItem.Id = strconv.Itoa(*counter)
 			}
+			buffer.WriteString(" id:'" + menuItem.Id + "'")
+
+			if menuItem.Name != "" {
+				buffer.WriteString(", name:'" + menuItem.Name + "'")
+			}
+			if menuItem.P != "" {
+				buffer.WriteString(", p:'" + menuItem.P + "'")
+			}
+			if &menuItem.Url != nil {
+				buffer.WriteString(", url:'" + menuItem.Url.Href + "'")
+				if menuItem.Url.Type != "" {
+					buffer.WriteString(", urlType:'" + menuItem.Url.Type + "'")
+				}
+			}
+			if menuItem.Directory != false {
+				buffer.WriteString(", directory:'" + btos(menuItem.Directory) + "'")
+			}
+			buffer.WriteString(", parent:'" + parent + "'")
+			buffer.WriteString("}")
 		}
-		if menuItem.Directory != false {
-			buffer.WriteString(", directory:'" + btos(menuItem.Directory) + "'")
-		}
-		buffer.WriteString(", parent:'" + parent + "'")
-		buffer.WriteString("}")
 		if menuItem.MenuItems != nil {
-			iterateMenuItem(menuItem.MenuItems, buffer, menuItem.Id, counter)
+			iterateMenuItem(menuItem.MenuItems, buffer, menuItem.Id, counter, permissionMap)
+		}
+	}
+}
+
+func iterateMenuGetPerm(menus []Menu, permissionMap *map[string]struct{}) {
+	for _, menu := range menus {
+		if menu.P != "" {
+			(*permissionMap)[menu.P] = struct{}{}
+		}
+		if menu.MenuItems != nil {
+			iterateMenuItemGetPerm(menu.MenuItems, permissionMap)
+		}
+	}
+}
+
+func iterateMenuItemGetPerm(menuItems []MenuItem, permissionMap *map[string]struct{}) {
+	for _, menuItem := range menuItems {
+		if menuItem.P != "" {
+			(*permissionMap)[menuItem.P] = struct{}{}
+		}
+		if menuItem.MenuItems != nil {
+			iterateMenuItemGetPerm(menuItem.MenuItems, permissionMap)
 		}
 	}
 }

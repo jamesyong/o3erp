@@ -117,10 +117,9 @@ func handler(p *httputil.ReverseProxy) func(http.ResponseWriter, *http.Request) 
 		r.Header.Set("X-Forwarded-Proto", "https")
 
 		session, _ := sessions.SessionStore.Get(r, "session-name")
-		partyId := session.Values["partyId"]
-		if partyId != nil {
-
-			r.Header.Set("REMOTE_USER", partyId.(string))
+		userLoginId := session.Values[sessions.USER_LOGIN_ID]
+		if userLoginId != nil {
+			r.Header.Set("REMOTE_USER", userLoginId.(string))
 		}
 		p.ServeHTTP(w, r)
 
