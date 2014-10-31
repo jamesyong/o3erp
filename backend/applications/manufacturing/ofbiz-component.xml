@@ -29,6 +29,7 @@ under the License.
 
     <!-- place the config directory on the classpath to access configuration files -->
     <classpath type="dir" location="config"/>
+    <classpath type="dir" location="i18n"/>
 
 
     <!-- entity resources: model(s), eca(s) and group definitions -->

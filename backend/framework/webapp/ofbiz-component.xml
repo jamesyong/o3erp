@@ -26,6 +26,7 @@ under the License.
 
     <classpath type="dir" location="config"/>
     <classpath type="dir" location="dtd"/>
+    <classpath type="dir" location="i18n"/>
     <classpath type="jar" location="lib/*"/>
     <classpath type="jar" location="build/lib/*"/>
 
