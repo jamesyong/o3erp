@@ -299,17 +299,24 @@ public class UtilProperties implements Serializable {
         Properties properties = resourceCache.get(cacheKey);
         if (properties == null) {
             try {
-                URL url = UtilURL.fromResource(resource);
-
-                if (url == null)
-                    return null;
-                String fileName = url.getFile();
-                File file = new File(fileName);
-                if (file.isDirectory()) {
-                    Debug.logError(fileName + " is (also?) a directory! No properties assigned.", module);
-                    return null;
-                }
-                properties = resourceCache.putIfAbsentAndGet(cacheKey, getProperties(url));
+            	Properties merged = new Properties();
+            	String[] resList = new String[]{resource, "ext."+resource };
+            	for(String res : resList){
+            		URL url = UtilURL.fromResource(res);
+                    if (url == null)
+                        continue;
+                    String fileName = url.getFile();
+                    File file = new File(fileName);
+                    if (file.isDirectory()) {
+                        Debug.logError(fileName + " is (also?) a directory! No properties assigned.", module);
+                        return null;
+                    }
+                    merged.putAll(getProperties(url));
+            	}
+            	if (merged.isEmpty()){
+            		return null;
+            	}
+                properties = resourceCache.putIfAbsentAndGet(cacheKey, merged);
             } catch (MissingResourceException e) {
                 Debug.logInfo(e, module);
             }
@@ -723,24 +730,32 @@ public class UtilProperties implements Serializable {
         if (locale == null) {
             throw new IllegalArgumentException("locale cannot be null");
         }
-        Properties properties = null;
-        URL url = resolvePropertiesUrl(resource, locale);
-        if (url != null) {
-            try {
-                properties = new ExtendedProperties(url, locale);
-            } catch (Exception e) {
-                if (UtilValidate.isNotEmpty(e.getMessage())) {
-                    Debug.logInfo(e.getMessage(), module);
-                } else {
-                    Debug.logInfo("Exception thrown: " + e.getClass().getName(), module);
-                }
-                properties = null;
-            }
+        
+        Properties merged = new Properties();
+        String[] resList = new String[]{resource, "ext."+resource };
+        
+        for(String res : resList){
+            URL url = resolvePropertiesUrl(res, locale);
+	        if (url != null) {
+	            Properties properties = null;
+	        	try {
+	                properties = new ExtendedProperties(url, locale);
+	                merged.putAll(properties);
+	            } catch (Exception e) {
+	                if (UtilValidate.isNotEmpty(e.getMessage())) {
+	                    Debug.logInfo(e.getMessage(), module);
+	                } else {
+	                    Debug.logInfo("Exception thrown: " + e.getClass().getName(), module);
+	                }
+	                properties = null;
+	            }
+	        }
+        }            	
+
+        if (UtilValidate.isNotEmpty(merged)) {
+            if (Debug.verboseOn()) Debug.logVerbose("Loaded " + merged.size() + " properties for: " + resource + " (" + locale + ")", module);
         }
-        if (UtilValidate.isNotEmpty(properties)) {
-            if (Debug.verboseOn()) Debug.logVerbose("Loaded " + properties.size() + " properties for: " + resource + " (" + locale + ")", module);
-        }
-        return properties;
+        return merged;
     }
 
     // ========= Classes and Methods for expanded Properties file support ========== //
