@@ -27,6 +27,12 @@ func GetHasEntityPermissionFunction(userLoginId string, entities []string, actio
 	}
 }
 
+func GetMessageMapFunction(userLoginId string, resource string, labels []string) ThriftFunc {
+	return func(client *thriftlib.BaseServiceClient) (map[string]string, error) {
+		return client.GetMessageMap(userLoginId, resource, labels)
+	}
+}
+
 func RunThriftService(thriftFunc ThriftFunc) (map[string]string, error) {
 
 	//addr := flag.String("addr", "localhost:9090", "Address to listen to")

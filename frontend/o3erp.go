@@ -36,16 +36,77 @@ func HomeHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	http.Redirect(w, r, "/dashboard", http.StatusFound)
 }
 
+func getProxyPathListForGet() []string {
+	return []string{
+		"/ap/*any",
+		"/ar/*any",
+		"/accounting/*any",
+		"/catalog/*any",
+		"/content/*any",
+		"/facility/*any",
+		"/humanres/*any",
+		"/manufacturing/*any",
+		"/marketing/*any",
+		"/ordermgr/*any",
+		"/partymgr/*any",
+		"/sfa/*any",
+		"/workeffort/*any",
+		"/bi/*any",
+		"/webtools/*any",
+		"/tomahawk/*any",
+		"/flatgrey/*any",
+		"/images/*any"}
+}
+
+func getProxyPathListForPost() []string {
+	return []string{
+		"/ap/*any",
+		"/ar/*any",
+		"/accounting/*any",
+		"/catalog/*any",
+		"/content/*any",
+		"/facility/*any",
+		"/humanres/*any",
+		"/manufacturing/*any",
+		"/marketing/*any",
+		"/ordermgr/*any",
+		"/partymgr/*any",
+		"/sfa/*any",
+		"/workeffort/*any",
+		"/bi/*any",
+		"/webtools/*any"}
+}
+
+func getPathMapForGet() map[string]httprouter.Handle {
+	m := make(map[string]httprouter.Handle)
+	m["/"] = HomeHandler
+	m["/login"] = handlers.LoginViewHandler
+	m["/logout"] = handlers.LogoutHandler
+	m["/dashboard"] = handlers.LayoutViewHandler
+	m["/menu"] = handlers.MenuHandler
+	return m
+}
+
+func getPathMapForPost() map[string]httprouter.Handle {
+	m := make(map[string]httprouter.Handle)
+	m["/login"] = handlers.LoginHandler
+	return m
+}
+
+var ProxyPathListForGet []string = getProxyPathListForGet()
+var ProxyPathListForPost []string = getProxyPathListForPost()
+var PathMapForGet map[string]httprouter.Handle = getPathMapForGet()
+var PathMapForPost map[string]httprouter.Handle = getPathMapForPost()
+
 func Startup() {
 	mux := httprouter.New()
-	mux.GET("/", HomeHandler)
-	mux.GET("/login", handlers.LoginViewHandler)
-	mux.POST("/login", handlers.LoginHandler)
-	mux.GET("/logout", handlers.LogoutHandler)
-	mux.GET("/dashboard", handlers.LayoutViewHandler)
 
-	// handle menu
-	mux.GET("/menu", handlers.MenuHandler)
+	for path := range PathMapForGet {
+		mux.GET(path, PathMapForGet[path])
+	}
+	for path := range PathMapForPost {
+		mux.POST(path, PathMapForPost[path])
+	}
 
 	// handle static files
 	mux.ServeFiles("/assets/*filepath", http.Dir("../o3erp/frontend/assets"))
@@ -58,40 +119,16 @@ func Startup() {
 	}
 	// handle reserve proxy
 	proxy := handler(httputil.NewSingleHostReverseProxy(u))
-	mux.HandlerFunc("GET", "/ap/*any", proxy)
-	mux.HandlerFunc("POST", "/ap/*any", proxy)
-	mux.HandlerFunc("GET", "/ar/*any", proxy)
-	mux.HandlerFunc("POST", "/ar/*any", proxy)
-	mux.HandlerFunc("GET", "/accounting/*any", proxy)
-	mux.HandlerFunc("POST", "/accounting/*any", proxy)
-	mux.HandlerFunc("GET", "/catalog/*any", proxy)
-	mux.HandlerFunc("POST", "/catalog/*any", proxy)
-	mux.HandlerFunc("GET", "/content/*any", proxy)
-	mux.HandlerFunc("POST", "/content/*any", proxy)
-	mux.HandlerFunc("GET", "/facility/*any", proxy)
-	mux.HandlerFunc("POST", "/facility/*any", proxy)
-	mux.HandlerFunc("GET", "/humanres/*any", proxy)
-	mux.HandlerFunc("POST", "/humanres/*any", proxy)
-	mux.HandlerFunc("GET", "/manufacturing/*any", proxy)
-	mux.HandlerFunc("POST", "/manufacturing/*any", proxy)
-	mux.HandlerFunc("GET", "/marketing/*any", proxy)
-	mux.HandlerFunc("POST", "/marketing/*any", proxy)
-	mux.HandlerFunc("GET", "/ordermgr/*any", proxy)
-	mux.HandlerFunc("POST", "/ordermgr/*any", proxy)
-	mux.HandlerFunc("GET", "/partymgr/*any", proxy)
-	mux.HandlerFunc("POST", "/partymgr/*any", proxy)
-	mux.HandlerFunc("GET", "/sfa/*any", proxy)
-	mux.HandlerFunc("POST", "/sfa/*any", proxy)
-	mux.HandlerFunc("GET", "/workeffort/*any", proxy)
-	mux.HandlerFunc("POST", "/workeffort/*any", proxy)
-	mux.HandlerFunc("GET", "/bi/*any", proxy)
-	mux.HandlerFunc("POST", "/bi/*any", proxy)
-	mux.HandlerFunc("GET", "/webtools/*any", proxy)
-	mux.HandlerFunc("POST", "/webtools/*any", proxy)
 
-	mux.HandlerFunc("GET", "/tomahawk/*any", proxy)
-	mux.HandlerFunc("GET", "/flatgrey/*any", proxy)
-	mux.HandlerFunc("GET", "/images/*any", proxy)
+	// set GET paths
+	for _, path := range ProxyPathListForGet {
+		mux.HandlerFunc("GET", path, proxy)
+	}
+
+	// set POST paths
+	for _, path := range ProxyPathListForPost {
+		mux.HandlerFunc("POST", path, proxy)
+	}
 
 	secureMiddleware := secure.New(secure.Options{
 		SSLRedirect: true,

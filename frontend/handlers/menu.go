@@ -82,13 +82,13 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	<menu name="SFA" directory="true" p="SFA_VIEW">
 		<url type='iframe'>/sfa/control/main</url>
     </menu>
-	<menu name="Work Effort" directory="true" p="WORKEFFORTMGR_VIEW">
+	<menu name="WorkEffort" directory="true" p="WORKEFFORTMGR_VIEW">
 		<url type='iframe'>/workeffort/control/main</url>
     </menu>
 	<menu name="Business Intelligence" directory="true" p="BI_VIEW">
 		<url type='iframe'>/bi/control/main</url>
     </menu>
-	<menu name="Web Tools" directory="true" p="WEBTOOLS_VIEW">
+	<menu name="WebTools" directory="true" p="WEBTOOLS_VIEW">
 		<url type='iframe'>/webtools/control/main</url>
     </menu>
 	</menuGroup>`
@@ -113,25 +113,33 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if userLoginId != nil {
 
 		permissionSet := make(map[string]struct{})
-		iterateMenuGetPerm(menusGroup[0].Menus, &permissionSet)
+		labelSet := make(map[string]struct{})
+		iterateMenuGetInfo(menusGroup[0].Menus, &permissionSet, &labelSet)
 
 		// convert permission from set to array
 		permissions := []string{}
 		for k := range permissionSet {
 			permissions = append(permissions, k)
 		}
+		// convert permission from set to array
+		labels := []string{}
+		for k := range labelSet {
+			labels = append(labels, k)
+		}
 
 		permissionMap, err := helper.RunThriftService(helper.GetHasPermissionFunction(userLoginId.(string), permissions))
 		if err != nil {
 			log.Println("error: ", err)
-		} else {
-			// log.Println("success: ", permissionMap, err)
+		}
+		labelMap, err := helper.RunThriftService(helper.GetMessageMapFunction(userLoginId.(string), "CommonUiLabels", labels))
+		if err != nil {
+			log.Println("error: ", err)
 		}
 
 		counter := 1
 		var buffer bytes.Buffer
 		buffer.WriteString("{ id:'root', name:'root'}")
-		iterateMenu(menusGroup[0].Menus, &buffer, "root", &counter, permissionMap)
+		iterateMenu(menusGroup[0].Menus, &buffer, "root", &counter, permissionMap, labelMap)
 		w.Header().Set("Content-Type", "text/json")
 		w.Write([]byte("[" + buffer.String() + "]"))
 
@@ -139,7 +147,7 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 }
 
-func iterateMenu(menus []Menu, buffer *bytes.Buffer, parent string, counter *int, permissionMap map[string]string) {
+func iterateMenu(menus []Menu, buffer *bytes.Buffer, parent string, counter *int, permissionMap map[string]string, labelMap map[string]string) {
 	for _, menu := range menus {
 		if menu.P == "" || permissionMap[menu.P] == "true" {
 			buffer.WriteString(",{")
@@ -149,7 +157,7 @@ func iterateMenu(menus []Menu, buffer *bytes.Buffer, parent string, counter *int
 			}
 			buffer.WriteString(" id:'" + menu.Id + "'")
 			if menu.Name != "" {
-				buffer.WriteString(", name:'" + menu.Name + "'")
+				buffer.WriteString(", name:'" + labelMap[menu.Name] + "'")
 			}
 			if menu.P != "" {
 				buffer.WriteString(", p:'" + menu.P + "'")
@@ -167,12 +175,12 @@ func iterateMenu(menus []Menu, buffer *bytes.Buffer, parent string, counter *int
 			buffer.WriteString("}")
 		}
 		if menu.MenuItems != nil {
-			iterateMenuItem(menu.MenuItems, buffer, menu.Id, counter, permissionMap)
+			iterateMenuItem(menu.MenuItems, buffer, menu.Id, counter, permissionMap, labelMap)
 		}
 	}
 }
 
-func iterateMenuItem(menuItems []MenuItem, buffer *bytes.Buffer, parent string, counter *int, permissionMap map[string]string) {
+func iterateMenuItem(menuItems []MenuItem, buffer *bytes.Buffer, parent string, counter *int, permissionMap map[string]string, labelMap map[string]string) {
 	for _, menuItem := range menuItems {
 		if menuItem.P == "" || permissionMap[menuItem.P] == "true" {
 			buffer.WriteString(",{")
@@ -183,7 +191,7 @@ func iterateMenuItem(menuItems []MenuItem, buffer *bytes.Buffer, parent string, 
 			buffer.WriteString(" id:'" + menuItem.Id + "'")
 
 			if menuItem.Name != "" {
-				buffer.WriteString(", name:'" + menuItem.Name + "'")
+				buffer.WriteString(", name:'" + labelMap[menuItem.Name] + "'")
 			}
 			if menuItem.P != "" {
 				buffer.WriteString(", p:'" + menuItem.P + "'")
@@ -201,29 +209,35 @@ func iterateMenuItem(menuItems []MenuItem, buffer *bytes.Buffer, parent string, 
 			buffer.WriteString("}")
 		}
 		if menuItem.MenuItems != nil {
-			iterateMenuItem(menuItem.MenuItems, buffer, menuItem.Id, counter, permissionMap)
+			iterateMenuItem(menuItem.MenuItems, buffer, menuItem.Id, counter, permissionMap, labelMap)
 		}
 	}
 }
 
-func iterateMenuGetPerm(menus []Menu, permissionMap *map[string]struct{}) {
+func iterateMenuGetInfo(menus []Menu, permissionMap *map[string]struct{}, labelMap *map[string]struct{}) {
 	for _, menu := range menus {
 		if menu.P != "" {
 			(*permissionMap)[menu.P] = struct{}{}
 		}
+		if menu.Name != "" {
+			(*labelMap)[menu.Name] = struct{}{}
+		}
 		if menu.MenuItems != nil {
-			iterateMenuItemGetPerm(menu.MenuItems, permissionMap)
+			iterateMenuItemGetInfo(menu.MenuItems, permissionMap, labelMap)
 		}
 	}
 }
 
-func iterateMenuItemGetPerm(menuItems []MenuItem, permissionMap *map[string]struct{}) {
+func iterateMenuItemGetInfo(menuItems []MenuItem, permissionMap *map[string]struct{}, labelMap *map[string]struct{}) {
 	for _, menuItem := range menuItems {
 		if menuItem.P != "" {
 			(*permissionMap)[menuItem.P] = struct{}{}
 		}
+		if menuItem.Name != "" {
+			(*labelMap)[menuItem.Name] = struct{}{}
+		}
 		if menuItem.MenuItems != nil {
-			iterateMenuItemGetPerm(menuItem.MenuItems, permissionMap)
+			iterateMenuItemGetInfo(menuItem.MenuItems, permissionMap, labelMap)
 		}
 	}
 }

@@ -2,12 +2,14 @@ package o3erp.thrift.impl;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import o3erp.thrift.BaseService;
 
 import org.apache.thrift.TException;
 import org.ofbiz.base.util.UtilMisc;
+import org.ofbiz.base.util.UtilProperties;
 import org.ofbiz.base.util.UtilValidate;
 import org.ofbiz.entity.Delegator;
 import org.ofbiz.entity.GenericEntityException;
@@ -106,6 +108,34 @@ public class BaseServiceHandler implements BaseService.Iface {
 		}
 		
 		return result;
+	}
+
+	@Override
+	public Map<String, String> getMessageMap(String userLoginId, String resource, List<String> names) throws TException {
+		LocalDispatcher dispatcher = ServiceContainer.getLocalDispatcher(this.delegator.getDelegatorName(), delegator);
+		
+		GenericValue userLogin;
+		try {
+			userLogin = delegator.findOne("UserLogin", true, "userLoginId", userLoginId);
+		} catch (GenericEntityException e) {
+			e.printStackTrace();
+			throw new TException(e.getMessage());
+		}
+		
+		Locale locale = null;
+		String localeString = userLogin.getString("lastLocale");
+        if (UtilValidate.isNotEmpty(localeString)) {
+            locale =  UtilMisc.parseLocale(localeString);
+        } else {
+            locale = Locale.getDefault();
+        }
+		
+		Map<String, String> result = new HashMap();
+		for(String name : names){
+			result.put(name, UtilProperties.getMessage(resource, name, locale));
+		}
+		return result;
+
 	}
 
 }
