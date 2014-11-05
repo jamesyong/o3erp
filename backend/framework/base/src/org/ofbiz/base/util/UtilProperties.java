@@ -24,6 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -1139,7 +1140,7 @@ public class UtilProperties implements Serializable {
             if (url.getFile().endsWith(".xml")) {
                 xmlToProperties(in, locale, this);
             } else {
-                load(in);
+                load(new InputStreamReader(in, "UTF-8"));
             }
             in.close();
         }
