@@ -4,6 +4,7 @@ import (
 	"github.com/jamesyong/o3erp/frontend/config"
 	"github.com/jamesyong/o3erp/frontend/handlers"
 	"github.com/jamesyong/o3erp/frontend/sessions"
+	"github.com/jamesyong/o3erp/frontend/templating"
 	"github.com/julienschmidt/httprouter"
 	"github.com/unrolled/secure"
 	"log"
@@ -99,6 +100,9 @@ var PathMapForGet map[string]httprouter.Handle = getPathMapForGet()
 var PathMapForPost map[string]httprouter.Handle = getPathMapForPost()
 
 func Startup() {
+
+	templating.Setup()
+
 	mux := httprouter.New()
 
 	for path := range PathMapForGet {
@@ -109,7 +113,7 @@ func Startup() {
 	}
 
 	// handle static files
-	mux.ServeFiles("/assets/*filepath", http.Dir("../o3erp/frontend/assets"))
+	mux.ServeFiles("/assets/*filepath", http.Dir(config.PATH_BASE_FRONTEND_ASSETS))
 
 	var u *url.URL
 	var err error
@@ -144,7 +148,7 @@ func Startup() {
 	}()
 
 	// HTTPS
-	log.Fatal(http.ListenAndServeTLS(config.PORT_HTTPS, "../o3erp/frontend/cert.pem", "../o3erp/frontend/key.pem", app))
+	log.Fatal(http.ListenAndServeTLS(config.PORT_HTTPS, "frontend/cert.pem", "frontend/key.pem", app))
 
 }
 
