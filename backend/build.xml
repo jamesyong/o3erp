@@ -1291,9 +1291,12 @@ under the License.
         <copy file="${basedir}/framework/resources/templates/Tests.xml" tofile="${ext.home}/hot-deploy/${component-name}/testdef/${component-resource-name}Tests.xml" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
-        <copy file="${basedir}/framework/resources/templates/UiLabels.xml" tofile="${ext.home}/hot-deploy/${component-name}/config/${component-resource-name}UiLabels.xml" encoding="utf-8">
+        <copy file="${basedir}/framework/resources/templates/UiLabels.properties" tofile="${ext.home}/hot-deploy/${component-name}/i18n/${component-resource-name}UiLabels.properties" encoding="utf-8">
             <filterset refid="replacePlaceholders"/>
         </copy>
+    	<copy file="${basedir}/framework/resources/templates/UiLabels_zh.properties" tofile="${ext.home}/hot-deploy/${component-name}/i18n/${component-resource-name}UiLabels_zh.properties" encoding="utf-8">
+    	     <filterset refid="replacePlaceholders"/>
+    	</copy>
         <copy file="${basedir}/framework/resources/templates/index.jsp" tofile="${ext.home}/hot-deploy/${component-name}/webapp/${webapp-name}/index.jsp" encoding="iso-8859-1">
             <filterset refid="replacePlaceholders"/>
         </copy>
