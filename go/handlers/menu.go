@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"github.com/jamesyong/o3erp/frontend/helper"
-	"github.com/jamesyong/o3erp/frontend/sessions"
+	"github.com/jamesyong/o3erp/go/helper"
+	"github.com/jamesyong/o3erp/go/sessions"
 	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
@@ -131,6 +131,7 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		if err != nil {
 			log.Println("error: ", err)
 		}
+
 		labelMap, err := helper.RunThriftService(helper.GetMessageMapFunction(userLoginId.(string), "CommonUiLabels", labels))
 		if err != nil {
 			log.Println("error: ", err)

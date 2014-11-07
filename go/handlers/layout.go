@@ -1,8 +1,8 @@
 package handlers
 
 import (
-	"github.com/jamesyong/o3erp/frontend/config"
-	"github.com/jamesyong/o3erp/frontend/templating"
+	"github.com/jamesyong/o3erp/go/config"
+	"github.com/jamesyong/o3erp/go/templating"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 )

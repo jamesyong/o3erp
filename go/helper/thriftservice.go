@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"git.apache.org/thrift.git/lib/go/thrift"
-	"github.com/jamesyong/o3erp/frontend/thriftlib"
+	"github.com/jamesyong/o3erp/go/thriftlib"
 )
 
 type ThriftFunc func(client *thriftlib.BaseServiceClient) (map[string]string, error)
