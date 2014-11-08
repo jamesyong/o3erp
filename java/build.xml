@@ -422,14 +422,17 @@ under the License.
 
     <target name="start"
             description="Start OFBiz (use -Dportoffset=portNumber to shift all ports with the portNumber value)">
-        <java jar="ofbiz.jar" fork="true">
-            <jvmarg value="${memory.initial.param}"/>
-            <jvmarg value="${memory.max.param}"/>
-            <jvmarg value="${memory.maxpermsize.param}"/>
-            <arg value="start"/>
-            <arg value="-portoffset=${portoffset}"/>
-        	<arg value="-ext.dir=${ext.dir}"/>
-        </java>
+        <parallel>
+            <java jar="ofbiz.jar" fork="true">
+                <jvmarg value="${memory.initial.param}"/>
+                <jvmarg value="${memory.max.param}"/>
+                <jvmarg value="${memory.maxpermsize.param}"/>
+                <arg value="start"/>
+                <arg value="-portoffset=${portoffset}"/>
+                <arg value="-ext.dir=${ext.dir}"/>
+            </java>
+	    <antcall target="startGo"/>
+        </parallel>
     </target>
     <target name="start-batch"
             description="Start OFBiz as a separate process. Use -Dportoffset=portNumber to shift all ports with the portNumber value.">

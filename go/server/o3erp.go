@@ -148,7 +148,8 @@ func Startup() {
 	}()
 
 	// HTTPS
-	log.Fatal(http.ListenAndServeTLS(config.PORT_HTTPS, "go/cert.pem", "go/key.pem", app))
+
+	log.Fatal(http.ListenAndServeTLS(config.PORT_HTTPS, config.PATH_BASE_GOLANG_CERT+"/cert.pem", config.PATH_BASE_GOLANG_CERT+"/key.pem", app))
 
 }
 
