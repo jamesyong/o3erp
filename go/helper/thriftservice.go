@@ -27,9 +27,9 @@ func GetHasEntityPermissionFunction(userLoginId string, entities []string, actio
 	}
 }
 
-func GetMessageMapFunction(userLoginId string, resource string, labels []string) ThriftFunc {
+func GetMessageMapFunction(userLoginId string, resourceLabels []string) ThriftFunc {
 	return func(client *thriftlib.BaseServiceClient) (map[string]string, error) {
-		return client.GetMessageMap(userLoginId, resource, labels)
+		return client.GetMessageMap(userLoginId, resourceLabels)
 	}
 }
 

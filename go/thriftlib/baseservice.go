@@ -30,9 +30,8 @@ type BaseService interface {
 	HasEntityPermission(userLoginId string, entities []string, actions []string) (r map[string]string, err error)
 	// Parameters:
 	//  - UserLoginId
-	//  - Resource
-	//  - Names
-	GetMessageMap(userLoginId string, resource string, names []string) (r map[string]string, err error)
+	//  - ResourceNames
+	GetMessageMap(userLoginId string, resourceNames []string) (r map[string]string, err error)
 }
 
 type BaseServiceClient struct {
@@ -278,16 +277,15 @@ func (p *BaseServiceClient) recvHasEntityPermission() (value map[string]string, 
 
 // Parameters:
 //  - UserLoginId
-//  - Resource
-//  - Names
-func (p *BaseServiceClient) GetMessageMap(userLoginId string, resource string, names []string) (r map[string]string, err error) {
-	if err = p.sendGetMessageMap(userLoginId, resource, names); err != nil {
+//  - ResourceNames
+func (p *BaseServiceClient) GetMessageMap(userLoginId string, resourceNames []string) (r map[string]string, err error) {
+	if err = p.sendGetMessageMap(userLoginId, resourceNames); err != nil {
 		return
 	}
 	return p.recvGetMessageMap()
 }
 
-func (p *BaseServiceClient) sendGetMessageMap(userLoginId string, resource string, names []string) (err error) {
+func (p *BaseServiceClient) sendGetMessageMap(userLoginId string, resourceNames []string) (err error) {
 	oprot := p.OutputProtocol
 	if oprot == nil {
 		oprot = p.ProtocolFactory.GetProtocol(p.Transport)
@@ -298,9 +296,8 @@ func (p *BaseServiceClient) sendGetMessageMap(userLoginId string, resource strin
 		return
 	}
 	args := GetMessageMapArgs{
-		UserLoginId: userLoginId,
-		Resource:    resource,
-		Names:       names,
+		UserLoginId:   userLoginId,
+		ResourceNames: resourceNames,
 	}
 	if err = args.Write(oprot); err != nil {
 		return
@@ -560,7 +557,7 @@ func (p *baseServiceProcessorGetMessageMap) Process(seqId int32, iprot, oprot th
 	result := GetMessageMapResult{}
 	var retval map[string]string
 	var err2 error
-	if retval, err2 = p.handler.GetMessageMap(args.UserLoginId, args.Resource, args.Names); err2 != nil {
+	if retval, err2 = p.handler.GetMessageMap(args.UserLoginId, args.ResourceNames); err2 != nil {
 		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing getMessageMap: "+err2.Error())
 		oprot.WriteMessageBegin("getMessageMap", thrift.EXCEPTION, seqId)
 		x.Write(oprot)
@@ -1432,9 +1429,8 @@ func (p *HasEntityPermissionResult) String() string {
 }
 
 type GetMessageMapArgs struct {
-	UserLoginId string   `thrift:"userLoginId,1" json:"userLoginId"`
-	Resource    string   `thrift:"resource,2" json:"resource"`
-	Names       []string `thrift:"names,3" json:"names"`
+	UserLoginId   string   `thrift:"userLoginId,1" json:"userLoginId"`
+	ResourceNames []string `thrift:"resourceNames,2" json:"resourceNames"`
 }
 
 func NewGetMessageMapArgs() *GetMessageMapArgs {
@@ -1445,12 +1441,8 @@ func (p *GetMessageMapArgs) GetUserLoginId() string {
 	return p.UserLoginId
 }
 
-func (p *GetMessageMapArgs) GetResource() string {
-	return p.Resource
-}
-
-func (p *GetMessageMapArgs) GetNames() []string {
-	return p.Names
+func (p *GetMessageMapArgs) GetResourceNames() []string {
+	return p.ResourceNames
 }
 func (p *GetMessageMapArgs) Read(iprot thrift.TProtocol) error {
 	if _, err := iprot.ReadStructBegin(); err != nil {
@@ -1471,10 +1463,6 @@ func (p *GetMessageMapArgs) Read(iprot thrift.TProtocol) error {
 			}
 		case 2:
 			if err := p.ReadField2(iprot); err != nil {
-				return err
-			}
-		case 3:
-			if err := p.ReadField3(iprot); err != nil {
 				return err
 			}
 		default:
@@ -1502,21 +1490,12 @@ func (p *GetMessageMapArgs) ReadField1(iprot thrift.TProtocol) error {
 }
 
 func (p *GetMessageMapArgs) ReadField2(iprot thrift.TProtocol) error {
-	if v, err := iprot.ReadString(); err != nil {
-		return fmt.Errorf("error reading field 2: %s", err)
-	} else {
-		p.Resource = v
-	}
-	return nil
-}
-
-func (p *GetMessageMapArgs) ReadField3(iprot thrift.TProtocol) error {
 	_, size, err := iprot.ReadListBegin()
 	if err != nil {
 		return fmt.Errorf("error reading list begin: %s", err)
 	}
 	tSlice := make([]string, 0, size)
-	p.Names = tSlice
+	p.ResourceNames = tSlice
 	for i := 0; i < size; i++ {
 		var _elem19 string
 		if v, err := iprot.ReadString(); err != nil {
@@ -1524,7 +1503,7 @@ func (p *GetMessageMapArgs) ReadField3(iprot thrift.TProtocol) error {
 		} else {
 			_elem19 = v
 		}
-		p.Names = append(p.Names, _elem19)
+		p.ResourceNames = append(p.ResourceNames, _elem19)
 	}
 	if err := iprot.ReadListEnd(); err != nil {
 		return fmt.Errorf("error reading list end: %s", err)
@@ -1540,9 +1519,6 @@ func (p *GetMessageMapArgs) Write(oprot thrift.TProtocol) error {
 		return err
 	}
 	if err := p.writeField2(oprot); err != nil {
-		return err
-	}
-	if err := p.writeField3(oprot); err != nil {
 		return err
 	}
 	if err := oprot.WriteFieldStop(); err != nil {
@@ -1568,26 +1544,13 @@ func (p *GetMessageMapArgs) writeField1(oprot thrift.TProtocol) (err error) {
 }
 
 func (p *GetMessageMapArgs) writeField2(oprot thrift.TProtocol) (err error) {
-	if err := oprot.WriteFieldBegin("resource", thrift.STRING, 2); err != nil {
-		return fmt.Errorf("%T write field begin error 2:resource: %s", p, err)
+	if err := oprot.WriteFieldBegin("resourceNames", thrift.LIST, 2); err != nil {
+		return fmt.Errorf("%T write field begin error 2:resourceNames: %s", p, err)
 	}
-	if err := oprot.WriteString(string(p.Resource)); err != nil {
-		return fmt.Errorf("%T.resource (2) field write error: %s", p, err)
-	}
-	if err := oprot.WriteFieldEnd(); err != nil {
-		return fmt.Errorf("%T write field end error 2:resource: %s", p, err)
-	}
-	return err
-}
-
-func (p *GetMessageMapArgs) writeField3(oprot thrift.TProtocol) (err error) {
-	if err := oprot.WriteFieldBegin("names", thrift.LIST, 3); err != nil {
-		return fmt.Errorf("%T write field begin error 3:names: %s", p, err)
-	}
-	if err := oprot.WriteListBegin(thrift.STRING, len(p.Names)); err != nil {
+	if err := oprot.WriteListBegin(thrift.STRING, len(p.ResourceNames)); err != nil {
 		return fmt.Errorf("error writing list begin: %s", err)
 	}
-	for _, v := range p.Names {
+	for _, v := range p.ResourceNames {
 		if err := oprot.WriteString(string(v)); err != nil {
 			return fmt.Errorf("%T. (0) field write error: %s", p, err)
 		}
@@ -1596,7 +1559,7 @@ func (p *GetMessageMapArgs) writeField3(oprot thrift.TProtocol) (err error) {
 		return fmt.Errorf("error writing list end: %s", err)
 	}
 	if err := oprot.WriteFieldEnd(); err != nil {
-		return fmt.Errorf("%T write field end error 3:names: %s", p, err)
+		return fmt.Errorf("%T write field end error 2:resourceNames: %s", p, err)
 	}
 	return err
 }

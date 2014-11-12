@@ -66,6 +66,45 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     </menu>
 	<menu name="HR" directory="true" p="HUMANRES_VIEW">
 		<url type='iframe'>/humanres/control/main</url>
+		<menu-item name="CommonMain">
+            <url type='iframe'>/humanres/control/main</url>
+        </menu-item>
+        	<menu-item name="HumanResUiLabels#HumanResEmployees">
+            <url type='iframe'>/humanres/control/findEmployees</url>
+        </menu-item>
+		<menu-item name="HumanResUiLabels#HumanResEmployment">
+            <url type='iframe'>/humanres/control/FindEmployments</url>
+        </menu-item>
+        <menu-item name="HumanResUiLabels#HumanResEmployeePosition">
+            <url type='iframe'>/humanres/control/FindEmplPositions</url>
+        </menu-item>
+        <menu-item name="HumanResUiLabels#HumanResPerfReview">
+            <url type='iframe'>/humanres/control/FindPerfReviews</url>
+        </menu-item>
+        <menu-item name="HumanResUiLabels#HumanResSkills">
+            <url type='iframe'>/humanres/control/FindPartySkills</url>
+        </menu-item>
+        <menu-item name="HumanResUiLabels#HumanResPartyQualification">
+            <url type='iframe'>/humanres/control/FindPartyQuals</url>
+        </menu-item>
+        <menu-item name="HumanResUiLabels#HumanResRecruitment">
+            <url type='iframe'>/humanres/control/FindJobRequisitions</url>
+        </menu-item>
+        <menu-item name="HumanResUiLabels#HumanResTraining">
+            <url type='iframe'>/humanres/control/TrainingCalendar</url>
+        </menu-item>
+        <menu-item name="HumanResUiLabels#HumanResEmploymentApp">
+            <url type='iframe'>/humanres/control/FindEmploymentApps</url>
+        </menu-item>
+        <menu-item name="HumanResUiLabels#HumanResPartyResume">
+            <url type='iframe'>/humanres/control/FindPartyResumes</url>
+        </menu-item>
+        <menu-item name="HumanResUiLabels#HumanResEmplLeave">
+            <url type='iframe'>/humanres/control/FindEmplLeaves</url>
+        </menu-item>
+        <menu-item name="HumanResUiLabels#HumanResGlobalHRSettings">
+            <url type='iframe'>/humanres/control/globalHRSettings</url>
+        </menu-item>
     </menu>
 	<menu name="Manufacturing" directory="true" p="MANUFACTURING_VIEW">
 		<url type='iframe'>/manufacturing/control/main</url>
@@ -132,7 +171,7 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 			log.Println("error: ", err)
 		}
 
-		labelMap, err := helper.RunThriftService(helper.GetMessageMapFunction(userLoginId.(string), "CommonUiLabels", labels))
+		labelMap, err := helper.RunThriftService(helper.GetMessageMapFunction(userLoginId.(string), labels))
 		if err != nil {
 			log.Println("error: ", err)
 		}

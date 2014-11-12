@@ -111,7 +111,7 @@ public class BaseServiceHandler implements BaseService.Iface {
 	}
 
 	@Override
-	public Map<String, String> getMessageMap(String userLoginId, String resource, List<String> names) throws TException {
+	public Map<String, String> getMessageMap(String userLoginId, List<String> resourceNames) throws TException {
 		LocalDispatcher dispatcher = ServiceContainer.getLocalDispatcher(this.delegator.getDelegatorName(), delegator);
 		
 		GenericValue userLogin;
@@ -131,8 +131,13 @@ public class BaseServiceHandler implements BaseService.Iface {
         }
 		
 		Map<String, String> result = new HashMap();
-		for(String name : names){
-			result.put(name, UtilProperties.getMessage(resource, name, locale));
+		for(String name : resourceNames){
+			String[] resourceName = name.split("#");
+			if (resourceName.length==1){
+				result.put(name, UtilProperties.getMessage("CommonUiLabels", resourceName[0], locale));
+			} else {
+				result.put(name, UtilProperties.getMessage(resourceName[0], resourceName[1], locale));
+			}
 		}
 		return result;
 

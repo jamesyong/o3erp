@@ -8,5 +8,5 @@ service BaseService {
 	/*
 	 * simple function to get translated messages based on current locale
 	 */
-	map<string,string> getMessageMap (1:string userLoginId, 2:string resource, 3:list<string> names)
+	map<string,string> getMessageMap (1:string userLoginId, 2:list<string> resourceNames)
 }
