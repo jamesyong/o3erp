@@ -51,7 +51,11 @@ under the License.
         <property name="port" value="9090"/>
         <property name="use-thread-pool" value="false"/>
         <property name="is-secure" value="true"/>
-        <property name="path-to-key-store" value="/thrift_home/lib/java/test/.keystore"/>
+        <property name="path-to-key-store" value="/thrift/lib/java/test/.keystore"/>
+    </container>
+    
+    <container name="plugin-container" class="o3erp.plugin.PluginContainer">
+        <property name="plugin-path" value="${sys:getProperty('ofbiz.home')}/framework/plugin/plugins"/>
     </container>
 
 </ofbiz-component>

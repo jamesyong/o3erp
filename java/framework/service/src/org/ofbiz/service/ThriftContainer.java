@@ -40,7 +40,7 @@ import org.ofbiz.entity.DelegatorFactory;
 /**
  * Container Implementation for Thrift
  * 
- * @author jamesyong
+ * @author james.yong
  * 
  */
 public class ThriftContainer implements Container {

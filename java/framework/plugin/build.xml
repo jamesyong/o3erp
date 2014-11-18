@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,18 +18,20 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project name="OFBiz Framework Build" default="build" basedir=".">
-    <filelist id="framework-builds" dir="framework"
-              files="start/build.xml,base/build.xml,sql/build.xml,
-               entity/build.xml,geronimo/build.xml,
-               catalina/build.xml,
-               security/build.xml,service/build.xml,entityext/build.xml,
-               bi/build.xml,minilang/build.xml,
-               webapp/build.xml,widget/build.xml,
-               common/build.xml,datafile/build.xml,
-               testtools/build.xml,
-               webtools/build.xml,
-    	       plugin/build.xml"/>
+<project name="O3ERP - Plugin" default="jar" basedir=".">
+    <import file="../../common.xml"/>
 
-    <filelist id="test-builds" dir="framework" files="base/build.xml,sql/build.xml,entity/build.xml"/>
+    <!-- ================================================================== -->
+    <!-- Initialization of all property settings                            -->
+    <!-- ================================================================== -->
+
+    <property name="desc" value="Plugin Component"/>
+    <property name="name" value="o3erp-plugin"/>
+
+    <path id="local.class.path">
+        <fileset dir="${lib.dir}" includes="*.jar"/>
+        <fileset dir="../../framework/base/lib" includes="*.jar"/>
+        <fileset dir="../../framework/base/build/lib" includes="*.jar"/>
+    </path>
+
 </project>

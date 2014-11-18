@@ -18,18 +18,10 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<project name="OFBiz Framework Build" default="build" basedir=".">
-    <filelist id="framework-builds" dir="framework"
-              files="start/build.xml,base/build.xml,sql/build.xml,
-               entity/build.xml,geronimo/build.xml,
-               catalina/build.xml,
-               security/build.xml,service/build.xml,entityext/build.xml,
-               bi/build.xml,minilang/build.xml,
-               webapp/build.xml,widget/build.xml,
-               common/build.xml,datafile/build.xml,
-               testtools/build.xml,
-               webtools/build.xml,
-    	       plugin/build.xml"/>
-
-    <filelist id="test-builds" dir="framework" files="base/build.xml,sql/build.xml,entity/build.xml"/>
-</project>
+<ofbiz-component name="plugin"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/ofbiz-component.xsd">
+    <resource-loader name="main" type="component"/>
+    <classpath type="jar" location="build/lib/*"/>
+    <classpath type="jar" location="lib/*"/>
+</ofbiz-component>
