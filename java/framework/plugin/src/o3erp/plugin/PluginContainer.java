@@ -41,7 +41,7 @@ public class PluginContainer implements Container {
 	protected String configFileLocation = null;
 	protected String containerName;
 	
-	PluginManager pluginManager;
+	public static PluginManager pluginManager;
 
 	@Override
     public void init(String[] args, String name, String configFile)
@@ -74,6 +74,10 @@ public class PluginContainer implements Container {
 	@Override
 	public String getName() {
         return containerName;
+	}
+	
+	public static PluginManager getPluginManager() {
+		return pluginManager;
 	}
 
 }

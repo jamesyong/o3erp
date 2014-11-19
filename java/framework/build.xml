@@ -23,13 +23,12 @@ under the License.
               files="start/build.xml,base/build.xml,sql/build.xml,
                entity/build.xml,geronimo/build.xml,
                catalina/build.xml,
-               security/build.xml,service/build.xml,entityext/build.xml,
+               security/build.xml,plugin/build.xml,service/build.xml,entityext/build.xml,
                bi/build.xml,minilang/build.xml,
                webapp/build.xml,widget/build.xml,
                common/build.xml,datafile/build.xml,
                testtools/build.xml,
-               webtools/build.xml,
-    	       plugin/build.xml"/>
+               webtools/build.xml"/>
 
     <filelist id="test-builds" dir="framework" files="base/build.xml,sql/build.xml,entity/build.xml"/>
 </project>

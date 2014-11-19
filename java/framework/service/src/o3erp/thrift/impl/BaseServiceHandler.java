@@ -4,7 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
+import o3erp.plugin.PluginContainer;
+import o3erp.plugin.extension.IExpression;
 import o3erp.thrift.BaseService;
 
 import org.apache.thrift.TException;
@@ -20,6 +23,8 @@ import org.ofbiz.service.LocalDispatcher;
 import org.ofbiz.service.ModelService;
 import org.ofbiz.service.ServiceContainer;
 import org.ofbiz.service.ServiceUtil;
+
+import ro.fortsoft.pf4j.PluginManager;
 
 public class BaseServiceHandler implements BaseService.Iface {
 	
@@ -79,10 +84,27 @@ public class BaseServiceHandler implements BaseService.Iface {
 		}
 		
 		Map<String, String> result = new HashMap();
-		for(String permission : permissions){
-			result.put(permission, security.hasPermission(permission, userLogin)?"true":"false");
-		}
 		
+		PluginManager pluginManager = PluginContainer.getPluginManager();
+		/**
+		 * check if we have plugin to evaluate logical expression
+		 */
+		List<IExpression> exprList = pluginManager.getExtensions(IExpression.class);
+		if (UtilValidate.isNotEmpty(exprList)){
+			IExpression iExpr = exprList.get(0);
+			for(String permission : permissions){
+				Set<String> variables = iExpr.getVariables(permission);
+				Map<String,Boolean> variableMap = new HashMap();
+				for(String variable:variables){
+					variableMap.put(variable, security.hasPermission(variable, userLogin));
+				}
+				result.put(permission, iExpr.evalExpr(permission, variableMap));
+			}
+		} else {
+			for(String permission : permissions){
+				result.put(permission, security.hasPermission(permission, userLogin)?"true":"false");
+			}
+		}
 		return result;
 	}
 
