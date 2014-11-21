@@ -54,6 +54,45 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     </menu>
 	<menu name="Accounting" directory="true" p="ACCOUNTING_VIEW">
 		<url type='iframe'>/accounting/control/main</url>
+		<menu-item name="CommonMain">
+            <url type='iframe'>/accounting/control/main</url>
+        </menu-item>
+		<menu-item id="invoices" name="AccountingUiLabels#AccountingInvoicesMenu">
+            <url type='iframe'>/accounting/control/findInvoices</url>
+        </menu-item>
+		<menu-item id="payments" name="AccountingUiLabels#AccountingPaymentsMenu">
+            <url type='iframe'>/accounting/control/findPayments</url>
+        </menu-item>
+		<menu-item id="PaymentGroup" name="AccountingUiLabels#AccountingPaymentGroup">
+            <url type='iframe'>/accounting/control/FindPaymentGroup</url>
+        </menu-item>
+		<menu-item id="transaction" p="MANUAL_PAYMENT | ACCOUNTING_CREATE" name="AccountingUiLabels#AccountingTransactions">
+            <url type='iframe'>/accounting/control/FindGatewayResponses</url>
+        </menu-item>
+		<menu-item id="PaymentGatewayConfig" p="PAYPROC_ADMIN | ACCOUNTING_ADMIN" name="AccountingUiLabels#AccountingPaymentGatewayConfig">
+            <url type='iframe'>/accounting/control/FindPaymentGatewayConfig</url>
+        </menu-item>
+        <menu-item id="billingaccount" name="AccountingUiLabels#AccountingBillingMenu">
+            <url type='iframe'>/accounting/control/FindBillingAccount</url>
+        </menu-item>
+        <menu-item id="FindFinAccount" name="AccountingUiLabels#AccountingFinAccount">
+            <url type='iframe'>/accounting/control/FinAccountMain</url>
+        </menu-item>
+        <menu-item id="TaxAuthorities" name="AccountingUiLabels#AccountingTaxAuthorities">
+            <url type='iframe'>/accounting/control/FindTaxAuthority</url>
+        </menu-item>
+        <menu-item id="agreements" name="AccountingUiLabels#AccountingAgreements">
+            <url type='iframe'>/accounting/control/FindAgreement</url>
+        </menu-item>
+        <menu-item id="ListFixedAssets" name="AccountingUiLabels#AccountingFixedAssets">
+            <url type='iframe'>/accounting/control/ListFixedAssets</url>
+        </menu-item>
+        <menu-item id="GlobalGLSettings" name="AccountingUiLabels#AccountingGlobalGLSettings">
+            <url type='iframe'>/accounting/control/globalGLSettings</url>
+        </menu-item>
+        <menu-item id="companies" name="AccountingUiLabels#AccountingOrgGlSettings">
+            <url type='iframe'>/accounting/control/ListCompanies</url>
+        </menu-item>		
     </menu>
 	<menu name="Catalog" directory="true" p="CATALOG_VIEW">
 		<url type='iframe'>/catalog/control/main</url>
