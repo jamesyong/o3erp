@@ -1,4 +1,4 @@
-package o3erp.plugin.extension;
+package o3erp.plugin;
 
 import java.util.Map;
 import java.util.Set;

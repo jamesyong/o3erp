@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import o3erp.plugin.PluginContainer;
-import o3erp.plugin.extension.IExpression;
+import o3erp.plugin.IExpression;
 import o3erp.thrift.BaseService;
 
 import org.apache.thrift.TException;
