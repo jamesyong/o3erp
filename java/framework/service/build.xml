@@ -40,8 +40,6 @@ under the License.
         <fileset dir="../entity/lib" includes="*.jar"/>
         <fileset dir="../entity/build/lib" includes="*.jar"/>
         <fileset dir="../security/build/lib" includes="*.jar"/>
-    	<fileset dir="../plugin/lib" includes="*.jar"/>
-    	<fileset dir="../plugin/build/lib" includes="*.jar"/>
     </path>
 
     <target name="stubs" depends="classes">

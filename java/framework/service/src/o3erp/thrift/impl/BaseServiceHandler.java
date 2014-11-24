@@ -6,12 +6,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import o3erp.plugin.PluginContainer;
 import o3erp.plugin.IExpression;
 import o3erp.thrift.BaseService;
 
 import org.apache.thrift.TException;
 import org.ofbiz.base.util.UtilMisc;
+import org.ofbiz.base.util.UtilPlugin;
 import org.ofbiz.base.util.UtilProperties;
 import org.ofbiz.base.util.UtilValidate;
 import org.ofbiz.entity.Delegator;
@@ -23,8 +23,6 @@ import org.ofbiz.service.LocalDispatcher;
 import org.ofbiz.service.ModelService;
 import org.ofbiz.service.ServiceContainer;
 import org.ofbiz.service.ServiceUtil;
-
-import ro.fortsoft.pf4j.PluginManager;
 
 public class BaseServiceHandler implements BaseService.Iface {
 	
@@ -85,13 +83,12 @@ public class BaseServiceHandler implements BaseService.Iface {
 		
 		Map<String, String> result = new HashMap();
 		
-		PluginManager pluginManager = PluginContainer.getPluginManager();
 		/**
 		 * check if we have plugin to evaluate logical expression
 		 */
-		List<IExpression> exprList = pluginManager.getExtensions(IExpression.class);
-		if (UtilValidate.isNotEmpty(exprList)){
-			IExpression iExpr = exprList.get(0);
+		IExpression iExpr = UtilPlugin.get(IExpression.class);
+
+		if (iExpr!=null){
 			for(String permission : permissions){
 				Set<String> variables = iExpr.getVariables(permission);
 				Map<String,Boolean> variableMap = new HashMap();
