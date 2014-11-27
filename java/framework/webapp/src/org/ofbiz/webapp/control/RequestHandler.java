@@ -1126,6 +1126,12 @@ public class RequestHandler {
 
         boolean didFullSecure = false;
         boolean didFullStandard = false;
+
+        /*
+         * james.yong 20141127:
+         * not using full path to avoid problem with javascript accessing parent from iframe
+         */
+        /*
         if (requestMap != null && (enableHttps || fullPath || secure)) {
             if (Debug.verboseOn()) Debug.logVerbose("In makeLink requestUri=" + requestUri, module);
             if (secure || (enableHttps && requestMap.securityHttps && !request.isSecure())) {
@@ -1155,7 +1161,7 @@ public class RequestHandler {
 
                 didFullStandard = true;
             }
-        }
+        }*/
 
         newURL.append(controlPath);
 

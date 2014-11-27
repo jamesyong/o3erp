@@ -17,6 +17,12 @@ specific language governing permissions and limitations
 under the License.
 -->
 
+<script>
+function doOnRowSelected(partyId,destUrl) {
+    parent.setSubTabContent("Employees", { id:partyId, name:partyId, url:destUrl, urlType:'iframe'})
+}
+</script>
+
 <#assign extInfo = parameters.extInfo?default("N")>
 
 <div id="findEmployee" class="screenlet">
@@ -173,7 +179,7 @@ under the License.
             <#list partyList as partyRow>
             <#assign partyType = partyRow.getRelatedOne("PartyType", false)?if_exists>
             <tr valign="middle"<#if alt_row> class="alternate-row"</#if>>
-                <td><a href="<@ofbizUrl>EmployeeProfile?partyId=${partyRow.partyId}</@ofbizUrl>">${partyRow.partyId}</a></td>
+                <td><a href="#" onclick="doOnRowSelected('${partyRow.partyId}', '<@ofbizUrl>EmployeeProfile?partyId=${partyRow.partyId}</@ofbizUrl>')">${partyRow.partyId}</a></td>
                 <td><#if partyRow.containsKey("userLoginId")>
                         ${partyRow.userLoginId?default("N/A")}
                     <#else>

@@ -129,7 +129,7 @@
 								if (item.url.indexOf('win:') === 0){
 									window.open(item.url.substring(4));
 								} else {
-									TabUtil.setTabContent(registry, "contentTabs", item);
+									TabUtil.setTabContent(item);
 								}
 							},
 							showRoot: false

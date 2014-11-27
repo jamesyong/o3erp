@@ -1,36 +1,70 @@
-define(["dojox/layout/ContentPane", "dojo/topic"], 
-	function(ContentPane, topic){
+define(["dojox/layout/ContentPane", "dojo/topic", "dijit/registry", "dijit/layout/TabContainer"], 
+	function(ContentPane, topic, registry){
 	    return {
-			setTabContent: function (registry, tabContainerId, item){
-		        var pane = dijit.byId(item.id)
+			setSubTabContent: function(pTabContainerId, item){
+				var pane = registry.byId(pTabContainerId+":"+item.id);
 				if (pane==null){
 					if (item.urlType=='iframe'){
 						pane = new ContentPane({
-					        id: item.id,
-					        title: item.name,
+					        id: pTabContainerId+":"+item.id,
+					        title: item.id,
 							content: '<iframe src="'+item.url+'" style="border: 0; width: 100%; height: 100%"></iframe>',
 							closable:true,
 							onClose: function(){
 							  topic.publish("tab/close", item.id);
 	  			              return true;
-					         }
+					        }
 					    });
 					} else {
 						pane = new ContentPane({
-							id: item.id,
-					        title: item.name,
+							id: pTabContainerId+":"+item.id,
+					        title: item.id,
 							href: item.url,
 							closable:true,
 							onClose: function(){
 							  topic.publish("tab/close", item.id);
 	  			              return true;
-					         }
+					        }
 					    });
 					}
-				    // add the new pane to our contentTabs widget
-				    registry.byId("contentTabs").addChild(pane);
+					registry.byId(pTabContainerId).addChild(pane);
 				}
-				registry.byId("contentTabs").selectChild(pane);
+				registry.byId(pTabContainerId).selectChild(pane);
+			},
+			setTabContent: function (item){
+				var tabContainer = registry.byId(item.id);
+				if (tabContainer==null){
+					tabContainer = new dijit.layout.TabContainer({
+						id: item.id,
+						title: item.name,
+						// doLayout: false,
+						nested: true,
+						closable:true,
+						onClose: function(){
+						  topic.publish("tab/close", item.id);
+  			              return true;
+				        }
+					});
+					// add the new sub tab container to our contentTabs widget
+					registry.byId("contentTabs").addChild(tabContainer);
+					
+					if (item.urlType=='iframe'){
+						var pane = new ContentPane({
+					        id: item.id+":list",
+					        title: "List",
+							content: '<iframe src="'+item.url+'" style="border: 0; width: 100%; height: 100%"></iframe>',
+					    });
+						tabContainer.addChild(pane);
+					} else {
+						var pane = new ContentPane({
+							id: item.id+":list",
+					        title: "List",
+							href: item.url
+					    });
+						tabContainer.addChild(pane);
+					}
+				}
+				registry.byId("contentTabs").selectChild(tabContainer);
 		    },
 			closeCurrentTab: function (tabContainerId){
 				var tc = dijit.byId(tabContainerId);
@@ -44,3 +78,12 @@ define(["dojox/layout/ContentPane", "dojo/topic"],
 		};
 	}	
 );
+
+
+
+function setSubTabContent(pTabContainerId,item) {
+    require(["commons/TabUtil"],function(TabUtil){
+        TabUtil.setSubTabContent( pTabContainerId, item );
+    });
+}
+

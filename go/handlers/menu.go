@@ -108,40 +108,40 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		<menu-item name="CommonMain">
             <url type='iframe'>/humanres/control/main</url>
         </menu-item>
-        	<menu-item name="HumanResUiLabels#HumanResEmployees">
+        	<menu-item id="Employees" name="HumanResUiLabels#HumanResEmployees">
             <url type='iframe'>/humanres/control/findEmployees</url>
         </menu-item>
-		<menu-item name="HumanResUiLabels#HumanResEmployment">
+		<menu-item id="Employment" name="HumanResUiLabels#HumanResEmployment">
             <url type='iframe'>/humanres/control/FindEmployments</url>
         </menu-item>
-        <menu-item name="HumanResUiLabels#HumanResEmployeePosition">
+        <menu-item id="EmplPosition" name="HumanResUiLabels#HumanResEmployeePosition">
             <url type='iframe'>/humanres/control/FindEmplPositions</url>
         </menu-item>
-        <menu-item name="HumanResUiLabels#HumanResPerfReview">
+        <menu-item id="PerfReview" name="HumanResUiLabels#HumanResPerfReview">
             <url type='iframe'>/humanres/control/FindPerfReviews</url>
         </menu-item>
-        <menu-item name="HumanResUiLabels#HumanResSkills">
+        <menu-item id="EmplSkills" name="HumanResUiLabels#HumanResSkills">
             <url type='iframe'>/humanres/control/FindPartySkills</url>
         </menu-item>
-        <menu-item name="HumanResUiLabels#HumanResPartyQualification">
+        <menu-item id="PartyQual" name="HumanResUiLabels#HumanResPartyQualification">
             <url type='iframe'>/humanres/control/FindPartyQuals</url>
         </menu-item>
-        <menu-item name="HumanResUiLabels#HumanResRecruitment">
+        <menu-item id="Recruitment" name="HumanResUiLabels#HumanResRecruitment">
             <url type='iframe'>/humanres/control/FindJobRequisitions</url>
         </menu-item>
-        <menu-item name="HumanResUiLabels#HumanResTraining">
+        <menu-item id="Training" name="HumanResUiLabels#HumanResTraining">
             <url type='iframe'>/humanres/control/TrainingCalendar</url>
         </menu-item>
-        <menu-item name="HumanResUiLabels#HumanResEmploymentApp">
+        <menu-item id="EmploymentApp" name="HumanResUiLabels#HumanResEmploymentApp">
             <url type='iframe'>/humanres/control/FindEmploymentApps</url>
         </menu-item>
-        <menu-item name="HumanResUiLabels#HumanResPartyResume">
+        <menu-item id="PartyResume" name="HumanResUiLabels#HumanResPartyResume">
             <url type='iframe'>/humanres/control/FindPartyResumes</url>
         </menu-item>
-        <menu-item name="HumanResUiLabels#HumanResEmplLeave">
+        <menu-item id="Leave" name="HumanResUiLabels#HumanResEmplLeave">
             <url type='iframe'>/humanres/control/FindEmplLeaves</url>
         </menu-item>
-        <menu-item name="HumanResUiLabels#HumanResGlobalHRSettings">
+        <menu-item id="GlobalHRSettings" name="HumanResUiLabels#HumanResGlobalHRSettings">
             <url type='iframe'>/humanres/control/globalHRSettings</url>
         </menu-item>
     </menu>
