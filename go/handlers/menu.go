@@ -48,9 +48,44 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	data := `<menuGroup>
 	<menu name="AP" directory="true" p="ACCOUNTING_VIEW">
 		<url type='iframe'>/ap/control/main</url>
+		
+		<menu-item id="apAgreements" name="AccountingUiLabels#AccountingAgreements">
+			<url type='iframe'>/ap/control/FindAgreement</url>
+		</menu-item>
+        <menu-item id="apInvoices" name="AccountingUiLabels#AccountingInvoicesMenu">
+			<url type='iframe'>/ap/control/FindApInvoices</url>
+		</menu-item>
+        <menu-item id="apPayments" name="AccountingUiLabels#AccountingPaymentsMenu">
+			<url type='iframe'>/ap/control/findPayments</url>
+		</menu-item>
+        <menu-item id="apPaymentGroups" name="AccountingUiLabels#AccountingApPaymentGroupMenu">
+			<url type='iframe'>/ap/control/FindApPaymentGroups</url>
+		</menu-item>
+        <menu-item id="apFindVendors" name="AccountingUiLabels#AccountingApPageTitleFindVendors">
+			<url type='iframe'>/ap/control/findVendors</url>
+		</menu-item>
+        <menu-item id="apReport" name="AccountingUiLabels#AccountingReports">
+			<url type='iframe'>/ap/control/listReports</url>
+		</menu-item>
+		
     </menu>
-	<menu name="AR" directory="true" p="ACCOUNTING_VIEW">
+	<menu id="ArAppBar" name="AR" directory="true" p="ACCOUNTING_VIEW">
 		<url type='iframe'>/ar/control/main</url>
+		<menu-item id="arAgreements" name="AccountingUiLabels#AccountingAgreements">
+			<url type='iframe'>/ar/control/FindAgreement</url>
+		</menu-item>
+        <menu-item id="arInvoices" name="AccountingUiLabels#AccountingInvoicesMenu">
+			<url type='iframe'>/ar/control/findInvoices</url>
+		</menu-item>
+        <menu-item id="arPayments" name="AccountingUiLabels#AccountingPaymentsMenu">
+			<url type='iframe'>/ar/control/findPayments</url>
+		</menu-item>
+        <menu-item id="arPaymentGroups" name="AccountingUiLabels#AccountingArPaymentGroupMenu">
+			<url type='iframe'>/ar/control/FindArPaymentGroups</url>
+		</menu-item>
+        <menu-item id="arReports" name="AccountingUiLabels#AccountingReports">
+			<url type='iframe'>/ar/control/ListReports</url>
+		</menu-item>
     </menu>
 	<menu name="Accounting" directory="true" p="ACCOUNTING_VIEW">
 		<url type='iframe'>/accounting/control/main</url>
@@ -94,8 +129,52 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
             <url type='iframe'>/accounting/control/ListCompanies</url>
         </menu-item>		
     </menu>
-	<menu name="Catalog" directory="true" p="CATALOG_VIEW">
+	<menu id="CatalogAppBar" name="Catalog" directory="true" p="CATALOG_VIEW">
 		<url type='iframe'>/catalog/control/main</url>
+		
+        <menu-item id="pCatalogs" name="ProductUiLabels#ProductCatalogs">
+			<url type='iframe'>/catalog/control/FindCatalog</url>
+		</menu-item>
+        <menu-item id="pCategories" name="ProductUiLabels#ProductCategories">
+			<url type='iframe'>/catalog/control/FindCategory</url>
+		</menu-item>
+        <menu-item id="pProducts" name="ProductUiLabels#ProductProducts">
+			<url type='iframe'>/catalog/control/FindProduct</url>
+		</menu-item>
+        <menu-item id="pFeaturecats" name="ProductUiLabels#ProductFeatureCats">
+			<url type='iframe'>/catalog/control/EditFeatureCategories</url>
+		</menu-item>
+        <menu-item id="pPromos" name="ProductUiLabels#ProductPromos">
+			<url type='iframe'>/catalog/control/FindProductPromo</url>
+		</menu-item>
+        <menu-item id="pPricerules" name="ProductUiLabels#ProductPriceRules">
+			<url type='iframe'>/catalog/control/FindProductPriceRules</url>
+		</menu-item>
+        <menu-item id="pStore" name="ProductUiLabels#ProductStores">
+			<url type='iframe'>/catalog/control/FindProductStore</url>
+		</menu-item>
+        <menu-item id="pStoreGroup" name="ProductUiLabels#ProductProductStoreGroups">
+			<url type='iframe'>/catalog/control/ListParentProductStoreGroup</url>
+		</menu-item>
+        <menu-item id="pThesaurus" name="ProductUiLabels#ProductThesaurus">
+			<url type='iframe'>/catalog/control/editKeywordThesaurus</url>
+		</menu-item>
+        <menu-item id="pReviews" name="ProductUiLabels#ProductReviews">
+			<url type='iframe'>/catalog/control/FindReviews</url>
+		</menu-item>
+        <menu-item id="pConfigs" name="ProductUiLabels#ProductConfigItems">
+			<url type='iframe'>/catalog/control/FindProductConfigItems</url>
+		</menu-item>
+        <menu-item id="pSubscription" name="ProductUiLabels#ProductSubscriptions">
+			<url type='iframe'>/catalog/control/FindSubscription</url>
+		</menu-item>
+        <menu-item id="pShipping" name="ProductUiLabels#ProductShipping">
+			<url type='iframe'>/catalog/control/ListShipmentMethodTypes</url>
+		</menu-item>
+        <menu-item id="pImagemanagement" name="ProductUiLabels#ImageManagement">
+			<url type='iframe'>/catalog/control/Imagemanagement</url>
+		</menu-item>
+
     </menu>
 	<menu name="Content" directory="true" p="CONTENT_VIEW">
 		<url type='iframe'>/content/control/main</url>
