@@ -21,25 +21,7 @@ under the License.
 <menus xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/widget-menu.xsd">
 
-    <menu name="FacilityAppBar" title="${uiLabelMap.ProductFacilityManager}" extends="CommonAppBarMenu" extends-resource="component://common/widget/CommonMenus.xml">
-        <menu-item name="facility" title="${uiLabelMap.ProductFacilities}"><link target="FindFacility"/></menu-item>
-        <menu-item name="facilityGroup" title="${uiLabelMap.ProductFacilityGroups}"><link target="FindFacilityGroup"/></menu-item>
-        <menu-item name="inventoryItemLabel" title="${uiLabelMap.ProductInventoryItemLabels}"><link target="FindInventoryItemLabels"/></menu-item>
-        <menu-item name="ShipmentGatewayConfig" title="${uiLabelMap.FacilityShipmentGatewayConfig}">
-            <condition>
-                <if-has-permission permission="PAYPROC" action="_ADMIN"/>
-            </condition>
-            <link target="FindShipmentGatewayConfig"/>
-        </menu-item>
-        <menu-item name="shipment" title="${uiLabelMap.ProductShipments}"><link target="FindShipment"/></menu-item>
-        <menu-item name="reports" title="${uiLabelMap.CommonReports}">
-            <condition>
-                <not><if-empty field="facilityId"/></not>
-            </condition>
-            <link target="InventoryReports">
-                <parameter param-name="facilityId"/>
-            </link>
-        </menu-item>
+    <menu name="FacilityAppBar" title="${uiLabelMap.ProductFacilityManager}">
     </menu>
 
     <menu name="FacilityTabBar" extends="CommonTabBarMenu" extends-resource="component://common/widget/CommonMenus.xml"

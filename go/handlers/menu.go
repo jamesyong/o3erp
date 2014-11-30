@@ -179,8 +179,27 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	<menu name="Content" directory="true" p="CONTENT_VIEW">
 		<url type='iframe'>/content/control/main</url>
     </menu>
-	<menu name="Facility" directory="true" p="FACILITY_VIEW">
+	<menu id="FacilityAppBar" name="Facility" directory="true" p="FACILITY_VIEW">
 		<url type='iframe'>/facility/control/main</url>
+		<menu-item id="fFacility" name="ProductUiLabels#ProductFacilities">
+			<url type='iframe'>/facility/control/FindFacility</url>
+        </menu-item>			
+        <menu-item id="fFacilityGroup" name="ProductUiLabels#ProductFacilityGroups">
+			<url type='iframe'>/facility/control/FindFacilityGroup</url>
+        </menu-item>			
+        <menu-item id="fInventoryItemLabel" name="ProductUiLabels#ProductInventoryItemLabels">
+			<url type='iframe'>/facility/control/FindInventoryItemLabels</url>
+        </menu-item>			
+        <menu-item id="fShipmentGatewayConfig" name="ProductUiLabels#FacilityShipmentGatewayConfig" p="PAYPROC_ADMIN">
+            <url type='iframe'>/facility/control/FindShipmentGatewayConfig</url>
+        </menu-item>
+        <menu-item id="fShipment" name="ProductUiLabels#ProductShipments">
+			<url type='iframe'>/facility/control/FindShipment</url>
+		</menu-item>
+        <menu-item id="fReports" name="CommonReports">
+			<!--TODO required facilityId, so add dropdown to select facility -->
+            <url type='iframe'>/facility/control/InventoryReports</url>
+        </menu-item>
     </menu>
 	<menu name="HR" directory="true" p="HUMANRES_VIEW">
 		<url type='iframe'>/humanres/control/main</url>
@@ -226,6 +245,35 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     </menu>
 	<menu name="Manufacturing" directory="true" p="MANUFACTURING_VIEW">
 		<url type='iframe'>/manufacturing/control/main</url>
+		
+		<menu-item id="mJobshop" name="ManufacturingUiLabels#ManufacturingJobShop" p="MANUFACTURING_CREATE">
+            <url type='iframe'>/manufacturing/control/FindProductionRun</url>
+        </menu-item>
+        <menu-item id="mRouting" name="ManufacturingUiLabels#ManufacturingRouting" p="MANUFACTURING_CREATE">
+            <url type='iframe'>/manufacturing/control/FindRouting</url>
+        </menu-item>
+        <menu-item id="mRoutingTask" name="ManufacturingUiLabels#ManufacturingRoutingTask" p="MANUFACTURING_CREATE">
+            <url type='iframe'>/manufacturing/control/FindRoutingTask</url>
+        </menu-item>
+        <menu-item id="mCalendar" name="ManufacturingUiLabels#ManufacturingCalendar" p="MANUFACTURING_CREATE">
+            <url type='iframe'>/manufacturing/control/FindCalendar</url>
+        </menu-item>
+        <menu-item id="mCosts" name="ManufacturingUiLabels#ManufacturingCostCalcs" p="MANUFACTURING_CREATE">
+            <url type='iframe'>/manufacturing/control/EditCostCalcs</url>
+        </menu-item>
+        <menu-item id="mBom" name="ManufacturingUiLabels#ManufacturingBillOfMaterials" p="MANUFACTURING_CREATE">
+            <url type='iframe'>/manufacturing/control/FindBom</url>
+        </menu-item>
+        <menu-item id="mMrp" name="ManufacturingUiLabels#ManufacturingMrp" p="MANUFACTURING_CREATE">
+            <url type='iframe'>/manufacturing/control/FindInventoryEventPlan</url>
+        </menu-item>
+        <menu-item id="mShipmentPlans" name="ManufacturingUiLabels#ManufacturingShipmentPlans" p="MANUFACTURING_CREATE">
+            <url type='iframe'>/manufacturing/control/WorkWithShipmentPlans</url>
+        </menu-item>
+        <menu-item id="mReports" name="ManufacturingUiLabels#ManufacturingReports" p="MANUFACTURING_CREATE">
+            <url type='iframe'>/manufacturing/control/ManufacturingReports</url>
+        </menu-item>
+		
     </menu>
 	<menu name="Marketing" directory="true" p="MARKETING_VIEW">
 		<url type='iframe'>/marketing/control/main</url>
