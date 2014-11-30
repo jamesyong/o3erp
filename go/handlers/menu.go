@@ -275,11 +275,68 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
         </menu-item>
 		
     </menu>
-	<menu name="Marketing" directory="true" p="MARKETING_VIEW">
+	<menu id="MarketingAppBar" name="Marketing" directory="true" p="MARKETING_VIEW">
 		<url type='iframe'>/marketing/control/main</url>
+		
+		<menu-item id="mkgDataSource" name="DataSource">
+			<url type='iframe'>/marketing/control/FindDataSource</url>
+		</menu-item>
+        <menu-item id="mkgCampaign" name="MarketingUiLabels#MarketingCampaign">
+			<url type='iframe'>/marketing/control/FindMarketingCampaign</url>
+		</menu-item>
+        <menu-item id="mkgTracking" name="MarketingUiLabels#MarketingTracking">
+			<url type='iframe'>/marketing/control/FindTrackingCode</url>
+		</menu-item>
+        <menu-item id="mkgSegment" name="MarketingUiLabels#MarketingSegment">
+			<url type='iframe'>/marketing/control/FindSegmentGroup</url>
+		</menu-item>
+        <menu-item id="mkgContactList" name="MarketingUiLabels#MarketingContactList">
+			<url type='iframe'>/marketing/control/FindContactLists</url>
+		</menu-item>
+        <menu-item id="mkgReports" name="MarketingUiLabels#MarketingReports">
+			<url type='iframe'>/marketing/control/MarketingReport</url>
+		</menu-item>
     </menu>
 	<menu name="Order" directory="true" p="ORDERMGR_VIEW">
 		<url type='iframe'>/ordermgr/control/main</url>
+		
+		<menu-item id="request" name="OrderUiLabels#OrderRequests" p="ORDERMGR_VIEW | ORDERMGR_PURCHASE_VIEW">
+            <url type='iframe'>/ordermgr/control/FindRequest</url>
+        </menu-item>
+
+        <menu-item id="quote" name="OrderUiLabels#OrderOrderQuotes" p="ORDERMGR_VIEW | ORDERMGR_PURCHASE_VIEW">
+            <url type='iframe'>/ordermgr/control/FindQuote</url>
+        </menu-item>
+
+        <menu-item id="orderlist" name="OrderUiLabels#OrderOrderList" p="ORDERMGR_VIEW">
+            <url type='iframe'>/ordermgr/control/orderlist</url>
+        </menu-item>
+
+        <menu-item id="findorders" name="OrderUiLabels#OrderFindOrder" p="ORDERMGR_VIEW">
+            <url type='iframe'>/ordermgr/control/findorders</url>
+        </menu-item>
+
+        <menu-item id="orderentry" name="OrderUiLabels#OrderOrderEntry" p="ORDERMGR_CREATE | ORDERMGR_PURCHASE_CREATE">
+            <url type='iframe'>/ordermgr/control/orderentry</url>
+        </menu-item>
+
+        <menu-item id="return" name="OrderUiLabels#OrderOrderReturns" p="ORDERMGR_RETURN">
+            <url type='iframe'>/ordermgr/control/findreturn</url>
+        </menu-item>
+
+        <menu-item id="requirement" name="OrderUiLabels#OrderRequirements" p="ORDERMGR_VIEW | ORDERMGR_ROLE_VIEW">
+            <url type='iframe'>/ordermgr/control/FindRequirements</url>
+        </menu-item>
+
+        <menu-item id="orderReports" name="CommonReports">
+            <url type='iframe'>/ordermgr/control/OrderPurchaseReportOptions</url>
+        </menu-item>
+
+        <menu-item id="orderStats" name="CommonStats">
+            <url type='iframe'>/ordermgr/control/orderstats</url>
+        </menu-item>
+
+		
     </menu>
 	<menu name="Party" directory="true" p="PARTYMGR_VIEW">
 		<url type='iframe'>/partymgr/control/main</url>
@@ -365,9 +422,11 @@ func iterateMenu(menus []Menu, buffer *bytes.Buffer, parent string, counter *int
 			if menu.Name != "" {
 				buffer.WriteString(", name:'" + labelMap[menu.Name] + "'")
 			}
-			if menu.P != "" {
-				buffer.WriteString(", p:'" + menu.P + "'")
-			}
+			/*
+				if menu.P != "" {
+					buffer.WriteString(", p:'" + menu.P + "'")
+				}
+			*/
 			if &menu.Url != nil {
 				buffer.WriteString(", url:'" + menu.Url.Href + "'")
 				if menu.Url.Type != "" {
@@ -399,9 +458,11 @@ func iterateMenuItem(menuItems []MenuItem, buffer *bytes.Buffer, parent string, 
 			if menuItem.Name != "" {
 				buffer.WriteString(", name:'" + labelMap[menuItem.Name] + "'")
 			}
-			if menuItem.P != "" {
-				buffer.WriteString(", p:'" + menuItem.P + "'")
-			}
+			/*
+				if menuItem.P != "" {
+					buffer.WriteString(", p:'" + menuItem.P + "'")
+				}
+			*/
 			if &menuItem.Url != nil {
 				buffer.WriteString(", url:'" + menuItem.Url.Href + "'")
 				if menuItem.Url.Type != "" {
