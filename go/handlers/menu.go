@@ -303,55 +303,163 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		<menu-item id="request" name="OrderUiLabels#OrderRequests" p="ORDERMGR_VIEW | ORDERMGR_PURCHASE_VIEW">
             <url type='iframe'>/ordermgr/control/FindRequest</url>
         </menu-item>
-
         <menu-item id="quote" name="OrderUiLabels#OrderOrderQuotes" p="ORDERMGR_VIEW | ORDERMGR_PURCHASE_VIEW">
             <url type='iframe'>/ordermgr/control/FindQuote</url>
         </menu-item>
-
         <menu-item id="orderlist" name="OrderUiLabels#OrderOrderList" p="ORDERMGR_VIEW">
             <url type='iframe'>/ordermgr/control/orderlist</url>
         </menu-item>
-
         <menu-item id="findorders" name="OrderUiLabels#OrderFindOrder" p="ORDERMGR_VIEW">
             <url type='iframe'>/ordermgr/control/findorders</url>
         </menu-item>
-
         <menu-item id="orderentry" name="OrderUiLabels#OrderOrderEntry" p="ORDERMGR_CREATE | ORDERMGR_PURCHASE_CREATE">
             <url type='iframe'>/ordermgr/control/orderentry</url>
         </menu-item>
-
         <menu-item id="return" name="OrderUiLabels#OrderOrderReturns" p="ORDERMGR_RETURN">
             <url type='iframe'>/ordermgr/control/findreturn</url>
         </menu-item>
-
         <menu-item id="requirement" name="OrderUiLabels#OrderRequirements" p="ORDERMGR_VIEW | ORDERMGR_ROLE_VIEW">
             <url type='iframe'>/ordermgr/control/FindRequirements</url>
         </menu-item>
-
         <menu-item id="orderReports" name="CommonReports">
             <url type='iframe'>/ordermgr/control/OrderPurchaseReportOptions</url>
         </menu-item>
-
         <menu-item id="orderStats" name="CommonStats">
             <url type='iframe'>/ordermgr/control/orderstats</url>
         </menu-item>
-
-		
     </menu>
 	<menu name="Party" directory="true" p="PARTYMGR_VIEW">
 		<url type='iframe'>/partymgr/control/main</url>
+		
+		<menu-item id="ptyFind" name="PartyUiLabels#PartyParties">
+			<url type='iframe'>/partymgr/control/findparty</url>
+		</menu-item>
+        <menu-item id="ptyMycomm" name="PartyUiLabels#PartyMyCommunications">
+			<url type='iframe'>/partymgr/control/MyCommunicationEvents</url>
+		</menu-item>
+        <menu-item id="ptyComm" name="PartyUiLabels#PartyCommunications">
+			<url type='iframe'>/partymgr/control/FindCommunicationEvents</url>
+		</menu-item>
+        <menu-item id="ptyVisits" name="PartyUiLabels#PartyVisits">
+			<url type='iframe'>/partymgr/control/findVisits</url>
+		</menu-item>
+        <menu-item id="ptyLoggedinusers" name="PartyUiLabels#PartyLoggedInUsers">
+			<url type='iframe'>/partymgr/control/listLoggedInUsers</url>
+		</menu-item>
+        <menu-item id="ptyClassification" name="PartyUiLabels#PartyClassifications">
+			<url type='iframe'>/partymgr/control/showclassgroups</url>
+		</menu-item>
+        <menu-item id="ptySecurity" name="CommonSecurity" p="PARTYMGR_VIEW">
+            <url type='iframe'>/partymgr/control/FindSecurityGroup</url>
+        </menu-item>
+        <menu-item id="addrmap" name="PartyUiLabels#PageTitleAddressMatchMap">
+			<url type='iframe'>/partymgr/control/addressMatchMap</url>
+		</menu-item>
+        <menu-item id="partyinv" name="PartyUiLabels#PartyInvitation">
+			<url type='iframe'>/partymgr/control/partyInvitation</url>
+		</menu-item>
+		
     </menu>
 	<menu name="SFA" directory="true" p="SFA_VIEW">
 		<url type='iframe'>/sfa/control/main</url>
+		
+		<menu-item id="sfaAccounts" name="MarketingUiLabels#SfaAcccounts">
+			<url type='iframe'>/sfa/control/FindAccounts</url>
+		</menu-item>
+        <menu-item id="sfaContacts" name="MarketingUiLabels#SfaContacts">
+			<url type='iframe'>/sfa/control/FindContacts</url>
+		</menu-item>
+        <menu-item id="sfaLeads" name="MarketingUiLabels#SfaLeads">
+			<url type='iframe'>/sfa/control/FindLeads</url>
+		</menu-item>
+        <menu-item id="sfaCompetitors" name="MarketingUiLabels#SfaCompetitors">
+			<url type='iframe'>#</url>
+		</menu-item>
+        <menu-item id="sfaEvents" name="MarketingUiLabels#SfaEvents">
+			<url type='iframe'>/sfa/control/Events</url>
+		</menu-item>
+        <menu-item id="sfaDocuments" name="MarketingUiLabels#SfaDocuments">
+			<url type='iframe'>#</url>
+		</menu-item>
+        <menu-item id="sfaForecast" name="MarketingUiLabels#SfaForecasts">
+			<url type='iframe'>/sfa/control/FindSalesForecast</url>
+		</menu-item>
+        <menu-item id="sfaOpportunities" name="MarketingUiLabels#SfaOpportunities">
+			<url type='iframe'>/sfa/control/FindSalesOpportunity</url>
+		</menu-item>
+			
     </menu>
 	<menu name="WorkEffort" directory="true" p="WORKEFFORTMGR_VIEW">
 		<url type='iframe'>/workeffort/control/main</url>
+		
+		<menu-item id="weTask" name="WorkEffortUiLabels#WorkEffortTaskList">
+			<url type='iframe'>/workeffort/control/mytasks</url>
+		</menu-item>
+        <menu-item id="weCalendar" name="WorkEffortUiLabels#WorkEffortCalendar">
+			<url type='iframe'>/workeffort/control/calendar</url>
+		</menu-item>
+        <menu-item id="weMytime" name="WorkEffortUiLabels#WorkEffortTimesheetMyTime">
+			<url type='iframe'>/workeffort/control/MyTimesheets</url>
+		</menu-item>
+        <menu-item id="weRequest" name="WorkEffortUiLabels#WorkEffortRequestList">
+			<url type='iframe'>/workeffort/control/requestlist</url>
+		</menu-item>
+        <menu-item id="weWorkeffort" name="WorkEffortUiLabels#WorkEffortWorkEffort">
+			<url type='iframe'>/workeffort/control/FindWorkEffort</url>
+		</menu-item>
+        <menu-item id="weTimesheet" name="WorkEffortUiLabels#WorkEffortTimesheet">
+			<url type='iframe'>/workeffort/control/FindTimesheet</url>
+		</menu-item>
+        <menu-item id="weUserJobs" name="WorkEffortUiLabels#WorkEffortJobList">
+			<url type='iframe'>/workeffort/control/UserJobs</url>
+		</menu-item>
+        <menu-item id="WorkEffortICalendar" name="WorkEffortUiLabels#WorkEffortICalendar">
+			<url type='iframe'>/workeffort/control/FindICalendars</url>
+		</menu-item>
+		
     </menu>
 	<menu name="Business Intelligence" directory="true" p="BI_VIEW">
 		<url type='iframe'>/bi/control/main</url>
     </menu>
 	<menu name="WebTools" directory="true" p="WEBTOOLS_VIEW">
 		<url type='iframe'>/webtools/control/main</url>
+		
+		<menu-item id="wtLogging" name="WebtoolsUiLabels#WebtoolsLogging">
+            <url type='iframe'>/webtools/control/LogView</url>
+        </menu-item>
+        <menu-item id="wtCache" name="WebtoolsUiLabels#WebtoolsCacheMaintenance">
+            <url type='iframe'>/webtools/control/FindUtilCache</url>
+        </menu-item>
+        <menu-item id="wtArtifact" name="WebtoolsUiLabels#WebtoolsArtifactInfo">
+            <url type='iframe'>/webtools/control/ArtifactInfo</url>
+        </menu-item>
+        <menu-item id="wtEntity" name="WebtoolsUiLabels#WebtoolsEntityEngine">
+            <url type='iframe'>/webtools/control/entitymaint</url>
+        </menu-item>
+        <menu-item id="wtService" name="WebtoolsUiLabels#WebtoolsServiceEngineTools">
+            <url type='iframe'>/webtools/control/ServiceList</url>
+        </menu-item>
+        <menu-item id="wtImportExport" name="WebtoolsUiLabels#WebtoolsImportExport">
+            <url type='iframe'>/webtools/control/xmldsdump</url>
+        </menu-item>
+        <menu-item id="wtStats" name="WebtoolsUiLabels#WebtoolsStatistics">
+            <url type='iframe'>/webtools/control/StatsSinceStart</url>
+        </menu-item>
+        <menu-item id="wtConfiguration" name="WebtoolsUiLabels#WebtoolsConfiguration">
+            <url type='iframe'>/webtools/control/myCertificates</url>
+        </menu-item>
+        <menu-item id="wtGeoManagement" name="WebtoolsUiLabels#WebtoolsGeoManagement">
+            <url type='iframe'>/webtools/control/FindGeo</url>
+        </menu-item>        
+        <menu-item id="wtPortalAdmin" name="WebtoolsUiLabels#WebtoolsAdminPortalPage" p="PORTALPAGE_ADMIN">
+            <url type='iframe'>/webtools/control/FindPortalPage</url>
+        </menu-item>
+        <menu-item id="wtSecurity" name="CommonSecurity" p="SECURITY_VIEW">
+            <url type='iframe'>/webtools/control/security</url>
+        </menu-item>
+        <menu-item id="wtLayoutDemo" name="WebtoolsUiLabels#WebtoolsLayoutDemo">
+            <url type='iframe'>/webtools/control/WebtoolsLayoutDemo</url>
+        </menu-item>
     </menu>
 	</menuGroup>`
 
