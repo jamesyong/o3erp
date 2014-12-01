@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,8 +18,14 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<component-loader xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/component-loader.xsd">
-    <load-component component-location="lucene"/>
-    <load-component component-location="ecommerce"/>
-</component-loader>
+<test-suite suite-name="lucenetests"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/test-suite.xsd">
+
+    <test-case case-name="lucene-tests-data-load">
+        <entity-xml action="load" entity-xml-url="component://lucene/testdef/data/LuceneTestsData.xml"/>
+    </test-case>
+
+    <test-case case-name="lucene-tests"><junit-test-suite class-name="org.ofbiz.content.test.LuceneTests"/></test-case>
+
+</test-suite>
