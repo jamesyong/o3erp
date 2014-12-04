@@ -31,40 +31,75 @@ define(["dojox/layout/ContentPane", "dojo/topic", "dijit/registry", "dijit/layou
 				}
 				registry.byId(pTabContainerId).selectChild(pane);
 			},
-			setTabContent: function (item){
-				var tabContainer = registry.byId(item.id);
-				if (tabContainer==null){
-					tabContainer = new dijit.layout.TabContainer({
-						id: item.id,
-						title: item.name,
-						// doLayout: false,
-						nested: true,
-						closable:true,
-						onClose: function(){
-						  topic.publish("tab/close", item.id);
-  			              return true;
-				        }
-					});
-					// add the new sub tab container to our contentTabs widget
-					registry.byId("contentTabs").addChild(tabContainer);
-					
-					if (item.urlType=='iframe'){
-						var pane = new ContentPane({
-					        id: item.id+":list",
-					        title: "List",
-							content: '<iframe src="'+item.url+'" style="border: 0; width: 100%; height: 100%"></iframe>',
-					    });
-						tabContainer.addChild(pane);
-					} else {
-						var pane = new ContentPane({
-							id: item.id+":list",
-					        title: "List",
-							href: item.url
-					    });
-						tabContainer.addChild(pane);
-					}
+			setTabContent: function (item, hasSubTabContent){
+				
+				if (typeof hasSubTabContent == "undefined"){
+					var hasSubTabContent = true;
 				}
-				registry.byId("contentTabs").selectChild(tabContainer);
+				if (hasSubTabContent){
+					var tabContainer = registry.byId(item.id);
+					if (tabContainer==null){
+						tabContainer = new dijit.layout.TabContainer({
+							id: item.id,
+							title: item.name,
+							// doLayout: false,
+							nested: true,
+							closable:true,
+							onClose: function(){
+							  topic.publish("tab/close", item.id);
+	  			              return true;
+					        }
+						});
+						// add the new sub tab container to our contentTabs widget
+						registry.byId("contentTabs").addChild(tabContainer);
+						
+						if (item.urlType=='iframe'){
+							var pane = new ContentPane({
+						        id: item.id+":list",
+						        title: "List",
+								content: '<iframe src="'+item.url+'" style="border: 0; width: 100%; height: 100%"></iframe>'
+						    });
+							tabContainer.addChild(pane);
+						} else {
+							var pane = new ContentPane({
+								id: item.id+":list",
+						        title: "List",
+								href: item.url
+						    });
+							tabContainer.addChild(pane);
+						}
+					}
+					registry.byId("contentTabs").selectChild(tabContainer);
+				} else {
+					var pane = registry.byId(item.id);
+					if (pane==null){
+						if (item.urlType=='iframe'){
+							pane = new ContentPane({
+						        id: item.id,
+						        title: item.name,
+								content: '<iframe src="'+item.url+'" style="border: 0; width: 100%; height: 100%"></iframe>',
+								closable:true,
+								onClose: function(){
+								  topic.publish("tab/close", item.id);
+		  			              return true;
+						        }
+						    });
+						} else {
+							pane = new ContentPane({
+								id: item.id,
+						        title: item.name,
+								href: item.url,
+								closable:true,
+								onClose: function(){
+								  topic.publish("tab/close", item.id);
+		  			              return true;
+						        }
+						    });
+						}
+						registry.byId("contentTabs").addChild(pane);
+						registry.byId("contentTabs").selectChild(pane);
+					} 
+				}
 		    },
 			closeCurrentTab: function (tabContainerId){
 				var tc = dijit.byId(tabContainerId);

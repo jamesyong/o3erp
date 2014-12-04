@@ -1,0 +1,16 @@
+<script>
+function changeDashboard(select){
+	document.getElementById('dashboardcontent').src = select.value;
+}
+
+</script>
+
+<select data-dojo-type="dijit/form/Select" type="text" value="Item 1" intermediateChanges="false" emptyLabel="&amp;#160;" scrollOnFocus="true" autoWidth="true" onchange="changeDashboard(this)">
+{{range $i, $e := .Labels}}<option value='{{index $.Links $i}}' selected='true'>{{index $.Labels $i}}</option>{{end}}
+  
+</select>
+
+
+
+<hr/>
+<iframe id="dashboardcontent" src="{{.url}}" style="border: 0; width: 100%; height: 90%"></iframe>

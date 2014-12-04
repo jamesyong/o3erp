@@ -34,7 +34,7 @@ func authenticationHandler(next http.Handler) http.Handler {
 
 // simple handler to redirect / to home view i.e. dashboard
 func HomeHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	http.Redirect(w, r, "/dashboard", http.StatusFound)
+	http.Redirect(w, r, "/main", http.StatusFound)
 }
 
 func getProxyPathListForGet() []string {
@@ -83,7 +83,8 @@ func getPathMapForGet() map[string]httprouter.Handle {
 	m["/"] = HomeHandler
 	m["/login"] = handlers.LoginViewHandler
 	m["/logout"] = handlers.LogoutHandler
-	m["/dashboard"] = handlers.LayoutViewHandler
+	m["/dashboard"] = handlers.DashboardViewHandler
+	m["/main"] = handlers.LayoutViewHandler
 	m["/menu"] = handlers.MenuHandler
 	return m
 }

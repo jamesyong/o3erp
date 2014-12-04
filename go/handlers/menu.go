@@ -12,43 +12,9 @@ import (
 	"strconv"
 )
 
-type MenuGroup struct {
-	XMLName xml.Name `xml:"menuGroup"`
-	Id      string
-	Menus   []Menu `xml:"menu" json:",omitempty"`
-}
-
-type UrlGroup struct {
-	XMLName struct{} `xml:"url"`
-	Type    string   `xml:"type,attr"`
-	Href    string   `xml:",chardata"`
-}
-
-type Menu struct {
-	XMLName   xml.Name   `xml:"menu" json:"-"`
-	Id        string     `xml:"id,attr" json:"id"`
-	Name      string     `xml:"name,attr" json:"name"`
-	P         string     `xml:"p,attr" json:"p"`
-	Url       UrlGroup   `xml:"url" json:"url"`
-	Directory bool       `xml:"directory,attr" json:"directory"`
-	MenuItems []MenuItem `xml:"menu-item" json:",omitempty"`
-}
-
-type MenuItem struct {
-	XMLName   xml.Name   `xml:"menu-item" json:"-"`
-	Id        string     `xml:"id,attr" json:"id"`
-	Name      string     `xml:"name,attr" json:"name"`
-	P         string     `xml:"p,attr" json:"p"`
-	Url       UrlGroup   `xml:"url" json:"url"`
-	Directory bool       `xml:"directory,attr" json:"directory"`
-	MenuItems []MenuItem `xml:"menu-item" json:",omitempty"`
-}
-
 func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	data := `<menuGroup>
 	<menu name="AP" directory="true" p="ACCOUNTING_VIEW">
-		<url type='iframe'>/ap/control/main</url>
-		
 		<menu-item id="apAgreements" name="AccountingUiLabels#AccountingAgreements">
 			<url type='iframe'>/ap/control/FindAgreement</url>
 		</menu-item>
@@ -67,10 +33,8 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
         <menu-item id="apReport" name="AccountingUiLabels#AccountingReports">
 			<url type='iframe'>/ap/control/listReports</url>
 		</menu-item>
-		
     </menu>
 	<menu id="ArAppBar" name="AR" directory="true" p="ACCOUNTING_VIEW">
-		<url type='iframe'>/ar/control/main</url>
 		<menu-item id="arAgreements" name="AccountingUiLabels#AccountingAgreements">
 			<url type='iframe'>/ar/control/FindAgreement</url>
 		</menu-item>
@@ -88,8 +52,7 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		</menu-item>
     </menu>
 	<menu name="Accounting" directory="true" p="ACCOUNTING_VIEW">
-		<url type='iframe'>/accounting/control/main</url>
-		<menu-item name="CommonMain">
+		<menu-item name="Overview">
             <url type='iframe'>/accounting/control/main</url>
         </menu-item>
 		<menu-item id="invoices" name="AccountingUiLabels#AccountingInvoicesMenu">
@@ -130,8 +93,9 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
         </menu-item>		
     </menu>
 	<menu id="CatalogAppBar" name="Catalog" directory="true" p="CATALOG_VIEW">
-		<url type='iframe'>/catalog/control/main</url>
-		
+		<menu-item name="Overview">
+			<url>/catalog/control/main</url>
+		</menu-item>
         <menu-item id="pCatalogs" name="ProductUiLabels#ProductCatalogs">
 			<url type='iframe'>/catalog/control/FindCatalog</url>
 		</menu-item>
@@ -174,13 +138,11 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
         <menu-item id="pImagemanagement" name="ProductUiLabels#ImageManagement">
 			<url type='iframe'>/catalog/control/Imagemanagement</url>
 		</menu-item>
-
     </menu>
 	<menu name="Content" directory="true" p="CONTENT_VIEW">
 		<url type='iframe'>/content/control/main</url>
     </menu>
 	<menu id="FacilityAppBar" name="Facility" directory="true" p="FACILITY_VIEW">
-		<url type='iframe'>/facility/control/main</url>
 		<menu-item id="fFacility" name="ProductUiLabels#ProductFacilities">
 			<url type='iframe'>/facility/control/FindFacility</url>
         </menu-item>			
@@ -202,10 +164,6 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
         </menu-item>
     </menu>
 	<menu name="HR" directory="true" p="HUMANRES_VIEW">
-		<url type='iframe'>/humanres/control/main</url>
-		<menu-item name="CommonMain">
-            <url type='iframe'>/humanres/control/main</url>
-        </menu-item>
         	<menu-item id="Employees" name="HumanResUiLabels#HumanResEmployees">
             <url type='iframe'>/humanres/control/findEmployees</url>
         </menu-item>
@@ -244,8 +202,6 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
         </menu-item>
     </menu>
 	<menu name="Manufacturing" directory="true" p="MANUFACTURING_VIEW">
-		<url type='iframe'>/manufacturing/control/main</url>
-		
 		<menu-item id="mJobshop" name="ManufacturingUiLabels#ManufacturingJobShop" p="MANUFACTURING_CREATE">
             <url type='iframe'>/manufacturing/control/FindProductionRun</url>
         </menu-item>
@@ -276,8 +232,6 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		
     </menu>
 	<menu id="MarketingAppBar" name="Marketing" directory="true" p="MARKETING_VIEW">
-		<url type='iframe'>/marketing/control/main</url>
-		
 		<menu-item id="mkgDataSource" name="DataSource">
 			<url type='iframe'>/marketing/control/FindDataSource</url>
 		</menu-item>
@@ -298,8 +252,6 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		</menu-item>
     </menu>
 	<menu name="Order" directory="true" p="ORDERMGR_VIEW">
-		<url type='iframe'>/ordermgr/control/main</url>
-		
 		<menu-item id="request" name="OrderUiLabels#OrderRequests" p="ORDERMGR_VIEW | ORDERMGR_PURCHASE_VIEW">
             <url type='iframe'>/ordermgr/control/FindRequest</url>
         </menu-item>
@@ -329,8 +281,6 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
         </menu-item>
     </menu>
 	<menu name="Party" directory="true" p="PARTYMGR_VIEW">
-		<url type='iframe'>/partymgr/control/main</url>
-		
 		<menu-item id="ptyFind" name="PartyUiLabels#PartyParties">
 			<url type='iframe'>/partymgr/control/findparty</url>
 		</menu-item>
@@ -361,8 +311,6 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		
     </menu>
 	<menu name="SFA" directory="true" p="SFA_VIEW">
-		<url type='iframe'>/sfa/control/main</url>
-		
 		<menu-item id="sfaAccounts" name="MarketingUiLabels#SfaAcccounts">
 			<url type='iframe'>/sfa/control/FindAccounts</url>
 		</menu-item>
@@ -390,8 +338,6 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 			
     </menu>
 	<menu name="WorkEffort" directory="true" p="WORKEFFORTMGR_VIEW">
-		<url type='iframe'>/workeffort/control/main</url>
-		
 		<menu-item id="weTask" name="WorkEffortUiLabels#WorkEffortTaskList">
 			<url type='iframe'>/workeffort/control/mytasks</url>
 		</menu-item>
@@ -416,14 +362,14 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
         <menu-item id="WorkEffortICalendar" name="WorkEffortUiLabels#WorkEffortICalendar">
 			<url type='iframe'>/workeffort/control/FindICalendars</url>
 		</menu-item>
-		
     </menu>
 	<menu name="Business Intelligence" directory="true" p="BI_VIEW">
 		<url type='iframe'>/bi/control/main</url>
     </menu>
 	<menu name="WebTools" directory="true" p="WEBTOOLS_VIEW">
-		<url type='iframe'>/webtools/control/main</url>
-		
+		<menu-item id="wtOverview" name="Overview">
+			<url type='iframe'>/webtools/control/main</url>
+		</menu-item>
 		<menu-item id="wtLogging" name="WebtoolsUiLabels#WebtoolsLogging">
             <url type='iframe'>/webtools/control/LogView</url>
         </menu-item>
@@ -463,7 +409,7 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
     </menu>
 	</menuGroup>`
 
-	menusGroup := []MenuGroup{}
+	menusGroup := []helper.MenuGroup{}
 	err := xml.Unmarshal([]byte(data), &menusGroup)
 	if err != nil {
 		fmt.Printf("error during unmarshal: %menus", err)
@@ -482,27 +428,7 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	userLoginId := session.Values[sessions.USER_LOGIN_ID]
 	if userLoginId != nil {
 
-		permissionSet := make(map[string]struct{})
-		labelSet := make(map[string]struct{})
-		iterateMenuGetInfo(menusGroup[0].Menus, &permissionSet, &labelSet)
-
-		// convert permission from set to array
-		permissions := []string{}
-		for k := range permissionSet {
-			permissions = append(permissions, k)
-		}
-		// convert permission from set to array
-		labels := []string{}
-		for k := range labelSet {
-			labels = append(labels, k)
-		}
-
-		permissionMap, err := helper.RunThriftService(helper.GetHasPermissionFunction(userLoginId.(string), permissions))
-		if err != nil {
-			log.Println("error: ", err)
-		}
-
-		labelMap, err := helper.RunThriftService(helper.GetMessageMapFunction(userLoginId.(string), labels))
+		permissionMap, labelMap, err := helper.GetMenuExtraInfo(menusGroup[0].Menus, userLoginId.(string))
 		if err != nil {
 			log.Println("error: ", err)
 		}
@@ -518,7 +444,7 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 }
 
-func iterateMenu(menus []Menu, buffer *bytes.Buffer, parent string, counter *int, permissionMap map[string]string, labelMap map[string]string) {
+func iterateMenu(menus []helper.Menu, buffer *bytes.Buffer, parent string, counter *int, permissionMap map[string]string, labelMap map[string]string) {
 	for _, menu := range menus {
 		if menu.P == "" || permissionMap[menu.P] == "true" {
 			buffer.WriteString(",{")
@@ -530,11 +456,7 @@ func iterateMenu(menus []Menu, buffer *bytes.Buffer, parent string, counter *int
 			if menu.Name != "" {
 				buffer.WriteString(", name:'" + labelMap[menu.Name] + "'")
 			}
-			/*
-				if menu.P != "" {
-					buffer.WriteString(", p:'" + menu.P + "'")
-				}
-			*/
+
 			if &menu.Url != nil {
 				buffer.WriteString(", url:'" + menu.Url.Href + "'")
 				if menu.Url.Type != "" {
@@ -553,7 +475,7 @@ func iterateMenu(menus []Menu, buffer *bytes.Buffer, parent string, counter *int
 	}
 }
 
-func iterateMenuItem(menuItems []MenuItem, buffer *bytes.Buffer, parent string, counter *int, permissionMap map[string]string, labelMap map[string]string) {
+func iterateMenuItem(menuItems []helper.MenuItem, buffer *bytes.Buffer, parent string, counter *int, permissionMap map[string]string, labelMap map[string]string) {
 	for _, menuItem := range menuItems {
 		if menuItem.P == "" || permissionMap[menuItem.P] == "true" {
 			buffer.WriteString(",{")
@@ -566,11 +488,6 @@ func iterateMenuItem(menuItems []MenuItem, buffer *bytes.Buffer, parent string, 
 			if menuItem.Name != "" {
 				buffer.WriteString(", name:'" + labelMap[menuItem.Name] + "'")
 			}
-			/*
-				if menuItem.P != "" {
-					buffer.WriteString(", p:'" + menuItem.P + "'")
-				}
-			*/
 			if &menuItem.Url != nil {
 				buffer.WriteString(", url:'" + menuItem.Url.Href + "'")
 				if menuItem.Url.Type != "" {
@@ -585,34 +502,6 @@ func iterateMenuItem(menuItems []MenuItem, buffer *bytes.Buffer, parent string, 
 		}
 		if menuItem.MenuItems != nil {
 			iterateMenuItem(menuItem.MenuItems, buffer, menuItem.Id, counter, permissionMap, labelMap)
-		}
-	}
-}
-
-func iterateMenuGetInfo(menus []Menu, permissionMap *map[string]struct{}, labelMap *map[string]struct{}) {
-	for _, menu := range menus {
-		if menu.P != "" {
-			(*permissionMap)[menu.P] = struct{}{}
-		}
-		if menu.Name != "" {
-			(*labelMap)[menu.Name] = struct{}{}
-		}
-		if menu.MenuItems != nil {
-			iterateMenuItemGetInfo(menu.MenuItems, permissionMap, labelMap)
-		}
-	}
-}
-
-func iterateMenuItemGetInfo(menuItems []MenuItem, permissionMap *map[string]struct{}, labelMap *map[string]struct{}) {
-	for _, menuItem := range menuItems {
-		if menuItem.P != "" {
-			(*permissionMap)[menuItem.P] = struct{}{}
-		}
-		if menuItem.Name != "" {
-			(*labelMap)[menuItem.Name] = struct{}{}
-		}
-		if menuItem.MenuItems != nil {
-			iterateMenuItemGetInfo(menuItem.MenuItems, permissionMap, labelMap)
 		}
 	}
 }

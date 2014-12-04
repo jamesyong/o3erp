@@ -142,8 +142,9 @@
 	
 					// start up and do layout
 					appLayout.startup();
-									
 					
+					TabUtil.setTabContent({ id:'dashboard', name:'dashboard', url:'/dashboard'}, false);
+									
 				});
 				var myToaster = new Toaster({id: 'myToaster'}, dom.byId('svrMessage'));
 				
