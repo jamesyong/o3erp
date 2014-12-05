@@ -18,9 +18,17 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-<component-loader xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/component-loader.xsd">
-    <load-component component-location="camel"/>
-    <load-component component-location="lucene"/>
-    <load-component component-location="ecommerce"/>
-</component-loader>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/services.xsd">
+    <description>Camel Services</description>
+    <vendor>OFBiz</vendor>
+    <version>1.0</version>
+
+    <service name="sendCamelMessage" engine="java" location="org.ofbiz.camel.services.CamelServices"
+        invoke="sendCamelMessage" auth="true" use-transaction="false">
+        <description>Sends a message to a Camel Endpoint</description>
+        <attribute mode="IN" name="endpoint" optional="false" type="String"/>
+        <attribute mode="IN" name="body" optional="true" type="Object"/>
+        <attribute mode="IN" name="headers" optional="true" type="Map"/>
+    </service>
+</services>

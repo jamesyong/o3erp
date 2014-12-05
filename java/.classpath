@@ -20,7 +20,6 @@
 	<classpathentry kind="lib" path="framework/base/lib/avalon-framework-4.2.0.jar"/>
 	<classpathentry kind="lib" path="framework/base/lib/barcode4j-2.1-barcode4j-fop-ext-complete.jar"/>
 	<classpathentry kind="lib" path="framework/base/lib/batik-all-1.7.jar"/>
-	<classpathentry kind="lib" path="framework/base/lib/clhm-release-1.0-lru.jar"/>
 	<classpathentry kind="lib" path="framework/base/lib/hamcrest-all-1.2.jar"/>
 	<classpathentry kind="lib" path="framework/base/lib/fop-1.1.jar"/>
 	<classpathentry kind="lib" path="framework/base/lib/freemarker-2.3.19-null-wildcards.jar"/>
@@ -130,6 +129,7 @@
 	<classpathentry kind="lib" path="framework/webapp/lib/rome-0.9.jar"/>
 	<classpathentry kind="lib" path="framework/webapp/lib/velocity-1.6.1.jar"/>
 	<classpathentry excluding="org/ofbiz/accounting/thirdparty/cybersource/**|org/ofbiz/accounting/thirdparty/verisign/**|org/ofbiz/accounting/thirdparty/worldpay/**|org/ofbiz/accounting/thirdparty/paypal/PayPalServices.java|org/ofbiz/accounting/thirdparty/orbital/**|org/ofbiz/accounting/thirdparty/securepay/**|org/ofbiz/accounting/thirdparty/ideal/**" kind="src" path="applications/accounting/src"/>
+	<classpathentry kind="src" path="specialpurpose/camel/src"/>
 	<classpathentry kind="src" path="specialpurpose/lucene/src"/>
 	<classpathentry excluding="org/ofbiz/content/openoffice/|org/ofbiz/content/report/" kind="src" path="applications/content/src"/>
 	<classpathentry kind="src" path="applications/manufacturing/src"/>
@@ -166,5 +166,7 @@
 	<classpathentry kind="lib" path="specialpurpose/lucene/lib/lucene-analyzers-common-4.9.0.jar"/>
 	<classpathentry kind="lib" path="specialpurpose/lucene/lib/lucene-core-4.9.0.jar"/>
 	<classpathentry kind="lib" path="specialpurpose/lucene/lib/lucene-queryparser-4.9.0.jar"/>
+	<classpathentry kind="lib" path="specialpurpose/camel/lib/camel-core-2.9.0.jar"/>
+	<classpathentry kind="lib" path="framework/base/lib/concurrentlinkedhashmap-lru-1.2_jdk5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

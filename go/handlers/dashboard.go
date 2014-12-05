@@ -16,7 +16,7 @@ func DashboardViewHandler(w http.ResponseWriter, r *http.Request, ps httprouter.
 	labels := []string{}
 	urls := []string{}
 
-	data := `<menuGroup>	<menu>
+	data := `<menuGroup><menu>
 			<menu-item name="AP" p="ACCOUNTING_VIEW">
 				<url>/ap/control/main</url>
 			</menu-item>
