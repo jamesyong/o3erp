@@ -77,8 +77,8 @@ under the License.
   </javac>
  </presetdef>
 
- <presetdef name="javac16">
-  <default-javac compiler="javac1.6" target="1.6" source="1.6" encoding="UTF-8" sourcepathref="src-path" includeantruntime="false">
+ <presetdef name="javac17">
+  <default-javac compiler="javac1.7" target="1.7" source="1.7" encoding="UTF-8" sourcepathref="src-path" includeantruntime="false">
    <compilerarg value="-Xlint:-path"/>
    <!--
    Please leave this line here.  It makes it easier to enable/disable it.
