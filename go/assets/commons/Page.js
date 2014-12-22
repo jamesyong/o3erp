@@ -51,9 +51,6 @@ define(["dojo/topic", "dijit/registry", "dojo/ready"],
 						
 					});
 					this.connect("tab/menu", function(){
-						registry.byId("btnNew").set("disabled", true);
-						registry.byId("btnSave").set("disabled", true);
-						registry.byId("btnCancel").set("disabled", true);
 						
 						tabMenuList.map(function(tabMenu){
 							switch(tabMenu) {

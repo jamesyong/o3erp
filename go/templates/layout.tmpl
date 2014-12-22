@@ -9,6 +9,8 @@
 		<link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/dojo/1.9.1/dijit/themes/claro/claro.css">
 		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.9.3/dojox/widget/Toaster/Toaster.css" />
 		
+		<link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+		
 		<style>
 		label {
 		  margin: 0;
@@ -117,7 +119,9 @@
 						new ContentPane({
 							region: "top",
 							"class": "edgePanel",
-							content: "Header content (top)"
+							href: "/header",
+							style:"height:35px;",
+							baseClass:"dijitContentPaneNoPadding" 
 						})
 					);
 					appLayout.addChild( 	menuTree );
@@ -143,7 +147,7 @@
 					// start up and do layout
 					appLayout.startup();
 					
-					TabUtil.setTabContent({ id:'dashboard', name:'dashboard', url:'/dashboard'}, false);
+					TabUtil.setTabContent({ id:'dashboard', name:'Dashboard', url:'/dashboard'}, false);
 									
 				});
 				var myToaster = new Toaster({id: 'myToaster'}, dom.byId('svrMessage'));

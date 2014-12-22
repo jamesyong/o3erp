@@ -103,22 +103,24 @@ define(["dojox/layout/ContentPane", "dojo/topic", "dijit/registry", "dijit/layou
 		    },
 			closeCurrentTab: function (tabContainerId){
 				var tc = dijit.byId(tabContainerId);
-				var id = tc.selectedChildWidget.id;
-				// onclose is not called when tab is closed programmatically, so we repeat onclose content here 
-				topic.publish("tab/close", id);
-
-				tc.removeChild(tc.selectedChildWidget);
-				dijit.byId(id).destroy();
+				if (tc!=null){
+					var select = tc.selectedChildWidget;
+					if (select!=null){
+						var id = select.id;
+						// onclose is not called when tab is closed programmatically, so we repeat onclose content here 
+						topic.publish("tab/close", id);
+		
+						tc.removeChild(select);
+						dijit.byId(id).destroy();
+					}
+				}
 			}
 		};
 	}	
 );
-
-
 
 function setSubTabContent(pTabContainerId,item) {
     require(["commons/TabUtil"],function(TabUtil){
         TabUtil.setSubTabContent( pTabContainerId, item );
     });
 }
-

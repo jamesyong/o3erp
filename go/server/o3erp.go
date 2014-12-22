@@ -86,6 +86,7 @@ func getPathMapForGet() map[string]httprouter.Handle {
 	m["/dashboard"] = handlers.DashboardViewHandler
 	m["/main"] = handlers.LayoutViewHandler
 	m["/menu"] = handlers.MenuHandler
+	m["/header"] = handlers.HeaderHandler
 	return m
 }
 
