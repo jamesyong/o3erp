@@ -57,10 +57,7 @@ under the License.
         </field>
         <field name="managerRoleTypeId"><ignored/></field>
         <field name="perfReviewId">
-           <hyperlink also-hidden="false" description="${perfReviewId}" target="EditPerfReview">
-                <parameter param-name="perfReviewId"/>
-                <parameter param-name="employeePartyId"/>
-                <parameter param-name="employeeRoleTypeId"/>
+           <hyperlink also-hidden="false" description="${perfReviewId}" target="javascript:parent.setSubTabContent('PerfReview', { id:'${perfReviewId}', name:'${perfReviewId}', url:'/humanres/control/EditPerfReview?perfReviewId=${perfReviewId}&amp;employeePartyId=${employeePartyId}&amp;employeeRoleTypeId=${employeeRoleTypeId}', urlType:'iframe'})" target-type="plain">
             </hyperlink>
         </field>
         <field name="fromDate"><display type="date"/></field>

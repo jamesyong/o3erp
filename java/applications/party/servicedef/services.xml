@@ -110,7 +110,7 @@ under the License.
         <override name="lastName" optional="false"/>
     </service>
     <service name="createPartyGroup" engine="java" default-entity-name="PartyGroup"
-            location="org.ofbiz.party.party.PartyServices" invoke="createPartyGroup" auth="false">
+            location="org.ofbiz.party.party.PartyServices" invoke="createPartyGroup" auth="true">
         <description>Create a PartyGroup</description>
         <auto-attributes mode="INOUT" include="pk" optional="true"/>
         <auto-attributes mode="IN" include="nonpk" optional="true"/>
