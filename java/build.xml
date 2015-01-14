@@ -538,6 +538,7 @@ under the License.
             <jvmarg value="${memory.maxpermsize.param}"/>
             <arg value="install"/>
             <arg value="readers=seed"/>
+            <arg value="-ext.dir=${ext.dir}"/>
         </java>
     </target>
     <target name="load-extseed" depends="build"
@@ -548,6 +549,7 @@ under the License.
             <jvmarg value="${memory.maxpermsize.param}"/>
             <arg value="install"/>
             <arg value="readers=seed,seed-initial,ext"/>
+            <arg value="-ext.dir=${ext.dir}"/>        	
         </java>
     </target>
     <target name="load-exttest" depends="build"
@@ -558,6 +560,7 @@ under the License.
             <jvmarg value="${memory.maxpermsize.param}"/>
             <arg value="install"/>
             <arg value="readers=seed,seed-initial,ext,ext-test"/>
+            <arg value="-ext.dir=${ext.dir}"/>        	
         </java>
     </target>
     <target name="load-readers" depends="build"
