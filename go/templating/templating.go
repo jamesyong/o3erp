@@ -6,9 +6,13 @@ import (
 )
 
 var (
-	Render *render.Render
+	Render  *render.Render
+	Options = render.Options{}
 )
 
 func Setup() {
-	Render = render.New(render.Options{Directory: config.PATH_BASE_GOLANG_TEMPLATES})
+	if Options.Directory == "" {
+		Options.Directory = config.PATH_BASE_GOLANG_TEMPLATES
+	}
+	Render = render.New(Options)
 }
