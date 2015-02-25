@@ -5,6 +5,7 @@
 		<title>O3 ERP</title>
 		<link rel="stylesheet" href="/assets/themes/common.css" media="screen">
 		<link rel="stylesheet" href="/assets/themes/style.css" media="screen">
+		<link rel="stylesheet" href="/assets/themes/form.css" media="screen">
 		
 		<link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/dojo/1.9.1/dijit/themes/claro/claro.css">
 		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.9.3/dojox/widget/Toaster/Toaster.css" />
@@ -19,7 +20,6 @@
 		  font-size: 100%;
 		  padding-top: .1em;
 		  padding-right: .25em;
-		  width: 6em;
 		  text-align: right;
 		  float: left; 
 		}
@@ -38,6 +38,10 @@
 				async: 1,
 				cacheBust: "1.9.3-0.3.15",
 				packages: [
+					{ name: 'dgrid', location: '//cdn.rawgit.com/SitePen/dgrid/v0.4.0' },
+					{ name: 'dstore', location: '//cdn.rawgit.com/SitePen/dstore/master' },
+				    { name: 'xstyle', location: '//cdn.rawgit.com/kriszyp/xstyle/v0.2.1' },
+				    { name: 'put-selector', location: '//cdn.rawgit.com/kriszyp/put-selector/v0.3.5' },
 					{ name: "commons", location: "/assets/commons" }
 				]
 			};

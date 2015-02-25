@@ -18,6 +18,9 @@ func MenuHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		<menu-item id="apAgreements" name="AccountingUiLabels#AccountingAgreements">
 			<url type='iframe'>/ap/control/FindAgreement</url>
 		</menu-item>
+		<menu-item id="apAgreements" name="Agreements (Work in progress)">
+			<url>/acctg_agreement</url>
+		</menu-item>
         <menu-item id="apInvoices" name="AccountingUiLabels#AccountingInvoicesMenu">
 			<url type='iframe'>/ap/control/FindApInvoices</url>
 		</menu-item>

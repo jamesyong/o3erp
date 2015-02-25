@@ -1,8 +1,11 @@
 package server
 
 import (
+	"database/sql"
 	"github.com/jamesyong/o3erp/go/config"
 	"github.com/jamesyong/o3erp/go/handlers"
+	"github.com/jamesyong/o3erp/go/handlers/h_accounting"
+	"github.com/jamesyong/o3erp/go/models"
 	"github.com/jamesyong/o3erp/go/sessions"
 	"github.com/jamesyong/o3erp/go/templating"
 	"github.com/julienschmidt/httprouter"
@@ -87,6 +90,10 @@ func getPathMapForGet() map[string]httprouter.Handle {
 	m["/main"] = handlers.LayoutViewHandler
 	m["/menu"] = handlers.MenuHandler
 	m["/header"] = handlers.HeaderHandler
+	m["/ondemand/list/:name"] = handlers.OnDemandListHandler
+	m["/ondemand/table/:name"] = handlers.OnDemandTableHandler
+
+	m["/acctg_agreement"] = h_accounting.AgreementViewHandler
 	return m
 }
 
@@ -144,6 +151,13 @@ func Startup() {
 
 	log.Println("Starting...")
 
+	models.DbMap = initDbMap()
+	defer models.DbMap.Close()
+	err = models.DbMap.Ping()
+	if err != nil {
+		log.Fatal("ping:", err)
+	}
+
 	// HTTP
 	go func() {
 		log.Fatal(http.ListenAndServe(config.PORT_HTTP, mux))
@@ -157,7 +171,6 @@ func Startup() {
 
 func handler(p *httputil.ReverseProxy) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.URL)
 		r.Header.Set("X-Forwarded-Proto", "https")
 
 		session, _ := sessions.SessionStore.Get(r, "session-name")
@@ -172,4 +185,13 @@ func handler(p *httputil.ReverseProxy) func(http.ResponseWriter, *http.Request) 
 			log.Println("Redirecting.. " + newLoc)
 		}
 	}
+}
+
+func initDbMap() *sql.DB {
+	db, err := sql.Open("mysql", "ofbiz:ofbiz@/ofbiz?charset=utf8&parseTime=True")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return db
+
 }

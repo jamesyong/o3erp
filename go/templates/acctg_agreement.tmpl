@@ -1,0 +1,90 @@
+{{ $msgMap := msg .userLoginId "agreementId:Agreement ID" "productId:AccountingUiLabels#AccountingProductId" "partyIdFrom:AccountingUiLabels#AccountingPartyIdFrom" "partyIdTo:AccountingUiLabels#AccountingPartyIdTo" "agreementTypeId:AccountingUiLabels#AccountingAgreementTypeId" "fromDate:CommonFromDate" "thruDate:CommonThruDate" "roleTypeIdTo:AccountingUiLabels#AccountingRoleTypeIdTo" "description:CommonDescription"}}
+
+<div data-dojo-type="dijit/layout/BorderContainer" design="sidebar" persist="false" gutters="true" style="min-width: 1em; min-height: 1px; z-index: 0; width: 100%; height: 300px;">
+   <div data-dojo-type="dijit/layout/ContentPane" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" region="top" splitter="true" maxSize="Infinity" doLayout="false" style="height:120px;">
+    <!--Start of ContentPane-->
+
+
+<div data-dojo-type="dojo/store/JsonRest"
+    data-dojo-id="productStore"
+    data-dojo-props="target: '/ondemand/list/product'"></div>
+
+
+<div id="myForm" data-dojo-id="myForm" data-dojo-type="dijit/form/Form" enctype="multipart/form-data" action="" method="POST">
+	<div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:2,customClass:'labelsAndValues',labelWidth:150" id="tc1">
+	  	<div data-dojo-type="dijit/form/TextBox" title="{{ index $msgMap "agreementId" }}"></div>
+	  	<div data-dojo-type="dijit/form/TextBox" title="{{ index $msgMap "agreementTypeId" }}"></div>	
+		<div data-dojo-type="dijit/form/TextBox" title="{{ index $msgMap "partyIdFrom" }}"></div>
+	  	<div data-dojo-type="dijit/form/TextBox" title="{{ index $msgMap "partyIdTo" }}"></div>
+	  	<div data-dojo-type="dijit/form/TextBox" title="{{ index $msgMap "fromDate" }}"></div>	
+	  	<div data-dojo-type="dijit/form/TextBox" title="{{ index $msgMap "thruDate" }}"></div>
+	  	<div data-dojo-type="dijit/form/FilteringSelect" title="{{ index $msgMap "productId" }}" data-dojo-props="store:productStore, searchAttr:'name'"></div>
+	</div>
+</div>
+    
+    
+  <!--End of ContentPane-->
+  </div>
+   <div data-dojo-type="dijit/layout/ContentPane" extractContent="false" preventCache="false" preload="false" refreshOnShow="false" region="center" splitter="false" maxSize="Infinity" doLayout="false">
+
+<div id="gProductList" style="width: 100%; height: 100%;"></div>
+
+<script type="dojo/method">
+	var debtorListGrid;
+	require([
+			"dojo/_base/declare",
+			"dgrid/OnDemandGrid",
+			"dgrid/Selection",
+			"dojo/request",
+			"dojo/store/Memory",
+			"dstore/Trackable",
+			"dijit/registry",
+			"commons/TabUtil",
+			"dstore/Rest",
+			"commons/Page", 
+			"dojo/domReady!"
+		], function (declare, OnDemandGrid, Selection, request, Memory, Trackable, registry, TabUtil, Rest, Page) {
+			var productStore = registry.byId("gProductStore");
+			if (productStore==null){
+				
+				var TrackedRestStore = declare([Rest, Trackable]);
+				
+				productStore = new TrackedRestStore({ 
+								target: "/ondemand/table/agreement",
+								idProperty: "agreementId"	});
+			}
+			
+			var CustomGrid = declare([ OnDemandGrid, Selection ]);
+			// Create an instance of OnDemandGrid referencing the store
+			debtorListGrid = new CustomGrid({
+				collection: productStore,
+				// OnDemandGrid
+				columns: {
+					agreementId: "{{ index $msgMap "agreementId" }}",
+					productId: "{{ index $msgMap "productId" }}",
+					partyIdFrom: "{{ index $msgMap "partyIdFrom" }}",
+					partyIdTo: "{{ index $msgMap "partyIdTo" }}",
+					roleTypeIdTo: "{{ index $msgMap "roleTypeIdTo" }}",
+					fromDate: "{{ index $msgMap "fromDate" }}",
+					thruDate: "{{ index $msgMap "thruDate" }}",
+					description: "{{ index $msgMap "description" }}"
+				},
+				selectionMode: 'single'
+			}, "gProductList");
+		
+			debtorListGrid.on("dgrid-select", function(event){
+				
+				var rowNum = event.rows[0].data.id;
+				var agreementId = event.rows[0].data.agreementId;
+				var tabId = "{{.tabId}}:"+rowNum;
+				var tabName = "Agreement: "+agreementId;
+				TabUtil.setTabContent(registry, "contentTabs", {id:tabId, name:tabName, url:"/debtor/detail/"+agreementId+"/"+rowNum});
+				
+			});
+			debtorListGrid.startup();
+
+		});
+      </script>
+
+   </div>
+ </div>
