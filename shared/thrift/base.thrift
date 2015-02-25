@@ -9,4 +9,5 @@ service BaseService {
 	 * simple function to get translated messages based on current locale
 	 */
 	map<string,string> getMessageMap (1:string userLoginId, 2:list<string> resourceNames)
+	map<string,string> callOfbizService (1:string userLoginId, 2:string serviceName, 3:map<string,string> context)
 }

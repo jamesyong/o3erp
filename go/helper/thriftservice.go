@@ -33,6 +33,12 @@ func GetMessageMapFunction(userLoginId string, resourceLabels []string) ThriftFu
 	}
 }
 
+func GetCallOfbizServiceFunction(userLoginId string, serviceName string, context map[string]string) ThriftFunc {
+	return func(client *thriftlib.BaseServiceClient) (map[string]string, error) {
+		return client.CallOfbizService(userLoginId, serviceName, context)
+	}
+}
+
 func RunThriftService(thriftFunc ThriftFunc) (map[string]string, error) {
 
 	//addr := flag.String("addr", "localhost:9090", "Address to listen to")

@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import o3erp.plugin.IExpression;
 import o3erp.thrift.BaseService;
 
 import org.apache.thrift.TException;
+import org.ofbiz.base.util.UtilDateTime;
 import org.ofbiz.base.util.UtilMisc;
 import org.ofbiz.base.util.UtilPlugin;
 import org.ofbiz.base.util.UtilProperties;
@@ -160,6 +162,30 @@ public class BaseServiceHandler implements BaseService.Iface {
 		}
 		return result;
 
+	}
+
+	@Override
+	public Map<String, String> callOfbizService(String userLoginId,
+			String serviceName, Map<String, String> context) throws TException {
+
+		GenericValue userLogin;
+		try {
+			userLogin = delegator.findOne("UserLogin", true, "userLoginId", userLoginId);
+		
+			LocalDispatcher dispatcher = ServiceContainer.getLocalDispatcher(this.delegator.getDelegatorName(), delegator);
+
+			String tzId = (String)userLogin.getString("lastTimeZone");
+			TimeZone timeZone = UtilDateTime.toTimeZone(tzId);
+			
+			Map<String,Object> serviceContext = ServiceUtil.setServiceFields(dispatcher, serviceName, (Map)context, userLogin, timeZone, Locale.getDefault());
+			serviceContext.put("userLogin", userLogin);
+			Map result = dispatcher.runSync(serviceName, serviceContext);
+			return result;
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new TException(e.getMessage());
+		}
+		
 	}
 
 }

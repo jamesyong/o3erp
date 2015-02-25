@@ -32,6 +32,11 @@ type BaseService interface {
 	//  - UserLoginId
 	//  - ResourceNames
 	GetMessageMap(userLoginId string, resourceNames []string) (r map[string]string, err error)
+	// Parameters:
+	//  - UserLoginId
+	//  - ServiceName
+	//  - Context
+	CallOfbizService(userLoginId string, serviceName string, context map[string]string) (r map[string]string, err error)
 }
 
 type BaseServiceClient struct {
@@ -346,6 +351,79 @@ func (p *BaseServiceClient) recvGetMessageMap() (value map[string]string, err er
 	return
 }
 
+// Parameters:
+//  - UserLoginId
+//  - ServiceName
+//  - Context
+func (p *BaseServiceClient) CallOfbizService(userLoginId string, serviceName string, context map[string]string) (r map[string]string, err error) {
+	if err = p.sendCallOfbizService(userLoginId, serviceName, context); err != nil {
+		return
+	}
+	return p.recvCallOfbizService()
+}
+
+func (p *BaseServiceClient) sendCallOfbizService(userLoginId string, serviceName string, context map[string]string) (err error) {
+	oprot := p.OutputProtocol
+	if oprot == nil {
+		oprot = p.ProtocolFactory.GetProtocol(p.Transport)
+		p.OutputProtocol = oprot
+	}
+	p.SeqId++
+	if err = oprot.WriteMessageBegin("callOfbizService", thrift.CALL, p.SeqId); err != nil {
+		return
+	}
+	args := CallOfbizServiceArgs{
+		UserLoginId: userLoginId,
+		ServiceName: serviceName,
+		Context:     context,
+	}
+	if err = args.Write(oprot); err != nil {
+		return
+	}
+	if err = oprot.WriteMessageEnd(); err != nil {
+		return
+	}
+	return oprot.Flush()
+}
+
+func (p *BaseServiceClient) recvCallOfbizService() (value map[string]string, err error) {
+	iprot := p.InputProtocol
+	if iprot == nil {
+		iprot = p.ProtocolFactory.GetProtocol(p.Transport)
+		p.InputProtocol = iprot
+	}
+	_, mTypeId, seqId, err := iprot.ReadMessageBegin()
+	if err != nil {
+		return
+	}
+	if mTypeId == thrift.EXCEPTION {
+		error8 := thrift.NewTApplicationException(thrift.UNKNOWN_APPLICATION_EXCEPTION, "Unknown Exception")
+		var error9 error
+		error9, err = error8.Read(iprot)
+		if err != nil {
+			return
+		}
+		if err = iprot.ReadMessageEnd(); err != nil {
+			return
+		}
+		err = error9
+		return
+	}
+	if p.SeqId != seqId {
+		err = thrift.NewTApplicationException(thrift.BAD_SEQUENCE_ID, "callOfbizService failed: out of sequence response")
+		return
+	}
+	result := CallOfbizServiceResult{}
+	if err = result.Read(iprot); err != nil {
+		return
+	}
+	if err = iprot.ReadMessageEnd(); err != nil {
+		return
+	}
+	value = result.GetSuccess()
+	return
+}
+
 type BaseServiceProcessor struct {
 	processorMap map[string]thrift.TProcessorFunction
 	handler      BaseService
@@ -366,12 +444,13 @@ func (p *BaseServiceProcessor) ProcessorMap() map[string]thrift.TProcessorFuncti
 
 func NewBaseServiceProcessor(handler BaseService) *BaseServiceProcessor {
 
-	self8 := &BaseServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
-	self8.processorMap["userLogin"] = &baseServiceProcessorUserLogin{handler: handler}
-	self8.processorMap["hasPermission"] = &baseServiceProcessorHasPermission{handler: handler}
-	self8.processorMap["hasEntityPermission"] = &baseServiceProcessorHasEntityPermission{handler: handler}
-	self8.processorMap["getMessageMap"] = &baseServiceProcessorGetMessageMap{handler: handler}
-	return self8
+	self10 := &BaseServiceProcessor{handler: handler, processorMap: make(map[string]thrift.TProcessorFunction)}
+	self10.processorMap["userLogin"] = &baseServiceProcessorUserLogin{handler: handler}
+	self10.processorMap["hasPermission"] = &baseServiceProcessorHasPermission{handler: handler}
+	self10.processorMap["hasEntityPermission"] = &baseServiceProcessorHasEntityPermission{handler: handler}
+	self10.processorMap["getMessageMap"] = &baseServiceProcessorGetMessageMap{handler: handler}
+	self10.processorMap["callOfbizService"] = &baseServiceProcessorCallOfbizService{handler: handler}
+	return self10
 }
 
 func (p *BaseServiceProcessor) Process(iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
@@ -384,12 +463,12 @@ func (p *BaseServiceProcessor) Process(iprot, oprot thrift.TProtocol) (success b
 	}
 	iprot.Skip(thrift.STRUCT)
 	iprot.ReadMessageEnd()
-	x9 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function "+name)
+	x11 := thrift.NewTApplicationException(thrift.UNKNOWN_METHOD, "Unknown function "+name)
 	oprot.WriteMessageBegin(name, thrift.EXCEPTION, seqId)
-	x9.Write(oprot)
+	x11.Write(oprot)
 	oprot.WriteMessageEnd()
 	oprot.Flush()
-	return false, x9
+	return false, x11
 
 }
 
@@ -568,6 +647,54 @@ func (p *baseServiceProcessorGetMessageMap) Process(seqId int32, iprot, oprot th
 		result.Success = retval
 	}
 	if err2 = oprot.WriteMessageBegin("getMessageMap", thrift.REPLY, seqId); err2 != nil {
+		err = err2
+	}
+	if err2 = result.Write(oprot); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.WriteMessageEnd(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err2 = oprot.Flush(); err == nil && err2 != nil {
+		err = err2
+	}
+	if err != nil {
+		return
+	}
+	return true, err
+}
+
+type baseServiceProcessorCallOfbizService struct {
+	handler BaseService
+}
+
+func (p *baseServiceProcessorCallOfbizService) Process(seqId int32, iprot, oprot thrift.TProtocol) (success bool, err thrift.TException) {
+	args := CallOfbizServiceArgs{}
+	if err = args.Read(iprot); err != nil {
+		iprot.ReadMessageEnd()
+		x := thrift.NewTApplicationException(thrift.PROTOCOL_ERROR, err.Error())
+		oprot.WriteMessageBegin("callOfbizService", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush()
+		return false, err
+	}
+
+	iprot.ReadMessageEnd()
+	result := CallOfbizServiceResult{}
+	var retval map[string]string
+	var err2 error
+	if retval, err2 = p.handler.CallOfbizService(args.UserLoginId, args.ServiceName, args.Context); err2 != nil {
+		x := thrift.NewTApplicationException(thrift.INTERNAL_ERROR, "Internal error processing callOfbizService: "+err2.Error())
+		oprot.WriteMessageBegin("callOfbizService", thrift.EXCEPTION, seqId)
+		x.Write(oprot)
+		oprot.WriteMessageEnd()
+		oprot.Flush()
+		return true, err2
+	} else {
+		result.Success = retval
+	}
+	if err2 = oprot.WriteMessageBegin("callOfbizService", thrift.REPLY, seqId); err2 != nil {
 		err = err2
 	}
 	if err2 = result.Write(oprot); err == nil && err2 != nil {
@@ -766,19 +893,19 @@ func (p *UserLoginResult) ReadField0(iprot thrift.TProtocol) error {
 	tMap := make(map[string]string, size)
 	p.Success = tMap
 	for i := 0; i < size; i++ {
-		var _key10 string
+		var _key12 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_key10 = v
+			_key12 = v
 		}
-		var _val11 string
+		var _val13 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_val11 = v
+			_val13 = v
 		}
-		p.Success[_key10] = _val11
+		p.Success[_key12] = _val13
 	}
 	if err := iprot.ReadMapEnd(); err != nil {
 		return fmt.Errorf("error reading map end: %s", err)
@@ -904,13 +1031,13 @@ func (p *HasPermissionArgs) ReadField2(iprot thrift.TProtocol) error {
 	tSlice := make([]string, 0, size)
 	p.Permissions = tSlice
 	for i := 0; i < size; i++ {
-		var _elem12 string
+		var _elem14 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_elem12 = v
+			_elem14 = v
 		}
-		p.Permissions = append(p.Permissions, _elem12)
+		p.Permissions = append(p.Permissions, _elem14)
 	}
 	if err := iprot.ReadListEnd(); err != nil {
 		return fmt.Errorf("error reading list end: %s", err)
@@ -1035,19 +1162,19 @@ func (p *HasPermissionResult) ReadField0(iprot thrift.TProtocol) error {
 	tMap := make(map[string]string, size)
 	p.Success = tMap
 	for i := 0; i < size; i++ {
-		var _key13 string
+		var _key15 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_key13 = v
+			_key15 = v
 		}
-		var _val14 string
+		var _val16 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_val14 = v
+			_val16 = v
 		}
-		p.Success[_key13] = _val14
+		p.Success[_key15] = _val16
 	}
 	if err := iprot.ReadMapEnd(); err != nil {
 		return fmt.Errorf("error reading map end: %s", err)
@@ -1182,13 +1309,13 @@ func (p *HasEntityPermissionArgs) ReadField2(iprot thrift.TProtocol) error {
 	tSlice := make([]string, 0, size)
 	p.Entities = tSlice
 	for i := 0; i < size; i++ {
-		var _elem15 string
+		var _elem17 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_elem15 = v
+			_elem17 = v
 		}
-		p.Entities = append(p.Entities, _elem15)
+		p.Entities = append(p.Entities, _elem17)
 	}
 	if err := iprot.ReadListEnd(); err != nil {
 		return fmt.Errorf("error reading list end: %s", err)
@@ -1204,13 +1331,13 @@ func (p *HasEntityPermissionArgs) ReadField3(iprot thrift.TProtocol) error {
 	tSlice := make([]string, 0, size)
 	p.Actions = tSlice
 	for i := 0; i < size; i++ {
-		var _elem16 string
+		var _elem18 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_elem16 = v
+			_elem18 = v
 		}
-		p.Actions = append(p.Actions, _elem16)
+		p.Actions = append(p.Actions, _elem18)
 	}
 	if err := iprot.ReadListEnd(); err != nil {
 		return fmt.Errorf("error reading list end: %s", err)
@@ -1359,19 +1486,19 @@ func (p *HasEntityPermissionResult) ReadField0(iprot thrift.TProtocol) error {
 	tMap := make(map[string]string, size)
 	p.Success = tMap
 	for i := 0; i < size; i++ {
-		var _key17 string
+		var _key19 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_key17 = v
+			_key19 = v
 		}
-		var _val18 string
+		var _val20 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_val18 = v
+			_val20 = v
 		}
-		p.Success[_key17] = _val18
+		p.Success[_key19] = _val20
 	}
 	if err := iprot.ReadMapEnd(); err != nil {
 		return fmt.Errorf("error reading map end: %s", err)
@@ -1497,13 +1624,13 @@ func (p *GetMessageMapArgs) ReadField2(iprot thrift.TProtocol) error {
 	tSlice := make([]string, 0, size)
 	p.ResourceNames = tSlice
 	for i := 0; i < size; i++ {
-		var _elem19 string
+		var _elem21 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_elem19 = v
+			_elem21 = v
 		}
-		p.ResourceNames = append(p.ResourceNames, _elem19)
+		p.ResourceNames = append(p.ResourceNames, _elem21)
 	}
 	if err := iprot.ReadListEnd(); err != nil {
 		return fmt.Errorf("error reading list end: %s", err)
@@ -1628,19 +1755,19 @@ func (p *GetMessageMapResult) ReadField0(iprot thrift.TProtocol) error {
 	tMap := make(map[string]string, size)
 	p.Success = tMap
 	for i := 0; i < size; i++ {
-		var _key20 string
+		var _key22 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_key20 = v
+			_key22 = v
 		}
-		var _val21 string
+		var _val23 string
 		if v, err := iprot.ReadString(); err != nil {
 			return fmt.Errorf("error reading field 0: %s", err)
 		} else {
-			_val21 = v
+			_val23 = v
 		}
-		p.Success[_key20] = _val21
+		p.Success[_key22] = _val23
 	}
 	if err := iprot.ReadMapEnd(); err != nil {
 		return fmt.Errorf("error reading map end: %s", err)
@@ -1695,4 +1822,316 @@ func (p *GetMessageMapResult) String() string {
 		return "<nil>"
 	}
 	return fmt.Sprintf("GetMessageMapResult(%+v)", *p)
+}
+
+type CallOfbizServiceArgs struct {
+	UserLoginId string            `thrift:"userLoginId,1" json:"userLoginId"`
+	ServiceName string            `thrift:"serviceName,2" json:"serviceName"`
+	Context     map[string]string `thrift:"context,3" json:"context"`
+}
+
+func NewCallOfbizServiceArgs() *CallOfbizServiceArgs {
+	return &CallOfbizServiceArgs{}
+}
+
+func (p *CallOfbizServiceArgs) GetUserLoginId() string {
+	return p.UserLoginId
+}
+
+func (p *CallOfbizServiceArgs) GetServiceName() string {
+	return p.ServiceName
+}
+
+func (p *CallOfbizServiceArgs) GetContext() map[string]string {
+	return p.Context
+}
+func (p *CallOfbizServiceArgs) Read(iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(); err != nil {
+		return fmt.Errorf("%T read error: %s", p, err)
+	}
+	for {
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		if err != nil {
+			return fmt.Errorf("%T field %d read error: %s", p, fieldId, err)
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 1:
+			if err := p.ReadField1(iprot); err != nil {
+				return err
+			}
+		case 2:
+			if err := p.ReadField2(iprot); err != nil {
+				return err
+			}
+		case 3:
+			if err := p.ReadField3(iprot); err != nil {
+				return err
+			}
+		default:
+			if err := iprot.Skip(fieldTypeId); err != nil {
+				return err
+			}
+		}
+		if err := iprot.ReadFieldEnd(); err != nil {
+			return err
+		}
+	}
+	if err := iprot.ReadStructEnd(); err != nil {
+		return fmt.Errorf("%T read struct end error: %s", p, err)
+	}
+	return nil
+}
+
+func (p *CallOfbizServiceArgs) ReadField1(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return fmt.Errorf("error reading field 1: %s", err)
+	} else {
+		p.UserLoginId = v
+	}
+	return nil
+}
+
+func (p *CallOfbizServiceArgs) ReadField2(iprot thrift.TProtocol) error {
+	if v, err := iprot.ReadString(); err != nil {
+		return fmt.Errorf("error reading field 2: %s", err)
+	} else {
+		p.ServiceName = v
+	}
+	return nil
+}
+
+func (p *CallOfbizServiceArgs) ReadField3(iprot thrift.TProtocol) error {
+	_, _, size, err := iprot.ReadMapBegin()
+	if err != nil {
+		return fmt.Errorf("error reading map begin: %s", err)
+	}
+	tMap := make(map[string]string, size)
+	p.Context = tMap
+	for i := 0; i < size; i++ {
+		var _key24 string
+		if v, err := iprot.ReadString(); err != nil {
+			return fmt.Errorf("error reading field 0: %s", err)
+		} else {
+			_key24 = v
+		}
+		var _val25 string
+		if v, err := iprot.ReadString(); err != nil {
+			return fmt.Errorf("error reading field 0: %s", err)
+		} else {
+			_val25 = v
+		}
+		p.Context[_key24] = _val25
+	}
+	if err := iprot.ReadMapEnd(); err != nil {
+		return fmt.Errorf("error reading map end: %s", err)
+	}
+	return nil
+}
+
+func (p *CallOfbizServiceArgs) Write(oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin("callOfbizService_args"); err != nil {
+		return fmt.Errorf("%T write struct begin error: %s", p, err)
+	}
+	if err := p.writeField1(oprot); err != nil {
+		return err
+	}
+	if err := p.writeField2(oprot); err != nil {
+		return err
+	}
+	if err := p.writeField3(oprot); err != nil {
+		return err
+	}
+	if err := oprot.WriteFieldStop(); err != nil {
+		return fmt.Errorf("write field stop error: %s", err)
+	}
+	if err := oprot.WriteStructEnd(); err != nil {
+		return fmt.Errorf("write struct stop error: %s", err)
+	}
+	return nil
+}
+
+func (p *CallOfbizServiceArgs) writeField1(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("userLoginId", thrift.STRING, 1); err != nil {
+		return fmt.Errorf("%T write field begin error 1:userLoginId: %s", p, err)
+	}
+	if err := oprot.WriteString(string(p.UserLoginId)); err != nil {
+		return fmt.Errorf("%T.userLoginId (1) field write error: %s", p, err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return fmt.Errorf("%T write field end error 1:userLoginId: %s", p, err)
+	}
+	return err
+}
+
+func (p *CallOfbizServiceArgs) writeField2(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("serviceName", thrift.STRING, 2); err != nil {
+		return fmt.Errorf("%T write field begin error 2:serviceName: %s", p, err)
+	}
+	if err := oprot.WriteString(string(p.ServiceName)); err != nil {
+		return fmt.Errorf("%T.serviceName (2) field write error: %s", p, err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return fmt.Errorf("%T write field end error 2:serviceName: %s", p, err)
+	}
+	return err
+}
+
+func (p *CallOfbizServiceArgs) writeField3(oprot thrift.TProtocol) (err error) {
+	if err := oprot.WriteFieldBegin("context", thrift.MAP, 3); err != nil {
+		return fmt.Errorf("%T write field begin error 3:context: %s", p, err)
+	}
+	if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRING, len(p.Context)); err != nil {
+		return fmt.Errorf("error writing map begin: %s", err)
+	}
+	for k, v := range p.Context {
+		if err := oprot.WriteString(string(k)); err != nil {
+			return fmt.Errorf("%T. (0) field write error: %s", p, err)
+		}
+		if err := oprot.WriteString(string(v)); err != nil {
+			return fmt.Errorf("%T. (0) field write error: %s", p, err)
+		}
+	}
+	if err := oprot.WriteMapEnd(); err != nil {
+		return fmt.Errorf("error writing map end: %s", err)
+	}
+	if err := oprot.WriteFieldEnd(); err != nil {
+		return fmt.Errorf("%T write field end error 3:context: %s", p, err)
+	}
+	return err
+}
+
+func (p *CallOfbizServiceArgs) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CallOfbizServiceArgs(%+v)", *p)
+}
+
+type CallOfbizServiceResult struct {
+	Success map[string]string `thrift:"success,0" json:"success"`
+}
+
+func NewCallOfbizServiceResult() *CallOfbizServiceResult {
+	return &CallOfbizServiceResult{}
+}
+
+var CallOfbizServiceResult_Success_DEFAULT map[string]string
+
+func (p *CallOfbizServiceResult) GetSuccess() map[string]string {
+	return p.Success
+}
+func (p *CallOfbizServiceResult) IsSetSuccess() bool {
+	return p.Success != nil
+}
+
+func (p *CallOfbizServiceResult) Read(iprot thrift.TProtocol) error {
+	if _, err := iprot.ReadStructBegin(); err != nil {
+		return fmt.Errorf("%T read error: %s", p, err)
+	}
+	for {
+		_, fieldTypeId, fieldId, err := iprot.ReadFieldBegin()
+		if err != nil {
+			return fmt.Errorf("%T field %d read error: %s", p, fieldId, err)
+		}
+		if fieldTypeId == thrift.STOP {
+			break
+		}
+		switch fieldId {
+		case 0:
+			if err := p.ReadField0(iprot); err != nil {
+				return err
+			}
+		default:
+			if err := iprot.Skip(fieldTypeId); err != nil {
+				return err
+			}
+		}
+		if err := iprot.ReadFieldEnd(); err != nil {
+			return err
+		}
+	}
+	if err := iprot.ReadStructEnd(); err != nil {
+		return fmt.Errorf("%T read struct end error: %s", p, err)
+	}
+	return nil
+}
+
+func (p *CallOfbizServiceResult) ReadField0(iprot thrift.TProtocol) error {
+	_, _, size, err := iprot.ReadMapBegin()
+	if err != nil {
+		return fmt.Errorf("error reading map begin: %s", err)
+	}
+	tMap := make(map[string]string, size)
+	p.Success = tMap
+	for i := 0; i < size; i++ {
+		var _key26 string
+		if v, err := iprot.ReadString(); err != nil {
+			return fmt.Errorf("error reading field 0: %s", err)
+		} else {
+			_key26 = v
+		}
+		var _val27 string
+		if v, err := iprot.ReadString(); err != nil {
+			return fmt.Errorf("error reading field 0: %s", err)
+		} else {
+			_val27 = v
+		}
+		p.Success[_key26] = _val27
+	}
+	if err := iprot.ReadMapEnd(); err != nil {
+		return fmt.Errorf("error reading map end: %s", err)
+	}
+	return nil
+}
+
+func (p *CallOfbizServiceResult) Write(oprot thrift.TProtocol) error {
+	if err := oprot.WriteStructBegin("callOfbizService_result"); err != nil {
+		return fmt.Errorf("%T write struct begin error: %s", p, err)
+	}
+	if err := p.writeField0(oprot); err != nil {
+		return err
+	}
+	if err := oprot.WriteFieldStop(); err != nil {
+		return fmt.Errorf("write field stop error: %s", err)
+	}
+	if err := oprot.WriteStructEnd(); err != nil {
+		return fmt.Errorf("write struct stop error: %s", err)
+	}
+	return nil
+}
+
+func (p *CallOfbizServiceResult) writeField0(oprot thrift.TProtocol) (err error) {
+	if p.IsSetSuccess() {
+		if err := oprot.WriteFieldBegin("success", thrift.MAP, 0); err != nil {
+			return fmt.Errorf("%T write field begin error 0:success: %s", p, err)
+		}
+		if err := oprot.WriteMapBegin(thrift.STRING, thrift.STRING, len(p.Success)); err != nil {
+			return fmt.Errorf("error writing map begin: %s", err)
+		}
+		for k, v := range p.Success {
+			if err := oprot.WriteString(string(k)); err != nil {
+				return fmt.Errorf("%T. (0) field write error: %s", p, err)
+			}
+			if err := oprot.WriteString(string(v)); err != nil {
+				return fmt.Errorf("%T. (0) field write error: %s", p, err)
+			}
+		}
+		if err := oprot.WriteMapEnd(); err != nil {
+			return fmt.Errorf("error writing map end: %s", err)
+		}
+		if err := oprot.WriteFieldEnd(); err != nil {
+			return fmt.Errorf("%T write field end error 0:success: %s", p, err)
+		}
+	}
+	return err
+}
+
+func (p *CallOfbizServiceResult) String() string {
+	if p == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("CallOfbizServiceResult(%+v)", *p)
 }
